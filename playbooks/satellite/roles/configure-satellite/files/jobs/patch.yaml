@@ -1,0 +1,66 @@
+---
+- hosts: all
+  tasks:
+    - name: Ensure the machine is online
+      ansible.builtin.wait_for_connection:
+
+    #- name: Create VMware Snapshot
+    #  community.vmware.vmware_guest_snapshot:
+    #    hostname: "{{ vcenter_hostname }}"
+    #    username: "{{ vcenter_username }}"
+    #    password: "{{ vcenter_password }}"
+    #    datacenter: "{{ datacenter_name }}"
+    #    folder: "/{{ datacenter_name }}/vm/"
+    #    name: "{{ guest_name }}"
+    #    state: present
+    #    snapshot_name: snap1
+    #    description: snap1_description
+    #  delegate_to: localhost
+
+    - name: Ensure the machine recovered after the snapshot
+      ansible.builtin.wait_for_connection:
+
+    - name: Install needs-restarting
+      ansible.builtin.package:
+        name: yum-utils
+        state: latest
+
+    - name: Update all packages
+      ansible.builtin.package:
+        name: '*'
+        state: latest
+
+    - name: check to see if we need a reboot
+      command: needs-restarting -r
+      register: result
+      ignore_errors: yes
+
+    - name: Reboot Server if Necessary
+      ansible.builtin.reboot:
+      when: result.rc == 1
+
+    - name: Pausing to allow server to shutdown and terminate our SSH connection
+      pause: seconds=30
+      when: result.rc == 1
+
+    - name: Wait for reboot to complete and SSH to become available
+      ansible.builtin.wait_for_connection:
+
+    - name: Apply all assigned roles
+      include_role:
+        name: "{{ role }}"
+      loop: "{{ foreman_ansible_roles }}"
+      loop_control:
+        loop_var: role
+
+    #- name: Delete VMware Snapshot
+    #  community.vmware.vmware_guest_snapshot:
+    #    hostname: "{{ vcenter_hostname }}"
+    #    username: "{{ vcenter_username }}"
+    #    password: "{{ vcenter_password }}"
+    #    datacenter: "{{ datacenter_name }}"
+    #    folder: "/{{ datacenter_name }}/vm/"
+    #    name: "{{ guest_name }}"
+    #    state: absent
+    #    snapshot_name: snap1
+    #  delegate_to: localhost

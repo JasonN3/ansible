@@ -1,0 +1,11 @@
+recommended_repos:
+  - rhel-8-for-x86_64-baseos-rpms
+  - rhel-8-for-x86_64-appstream-rpms
+  - rhel-8-for-x86_64-baseos-kickstart
+  - rhel-8-for-x86_64-appstream-kickstart
+  - rhel-9-for-x86_64-baseos-rpms
+  - rhel-9-for-x86_64-appstream-rpms
+  - rhel-9-for-x86_64-baseos-kickstart
+  - rhel-9-for-x86_64-appstream-kickstart
+  - satellite-client-6-for-rhel-8-x86_64-rpms
+  - satellite-client-6-for-rhel-9-x86_64-rpms

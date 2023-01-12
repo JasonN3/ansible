@@ -1,0 +1,41 @@
+---
+#- name: Install local pre-reqs
+#  hosts:
+#    - localhost
+#  roles:
+#    - pre-reqs
+#  pre_tasks:
+#  - name: Import configure variables
+#    include_vars:
+#      file: configure.yaml
+
+
+#- name: Check external acces
+#  hosts:
+#    - satellite
+#  roles:
+#    - access-external
+#  pre_tasks:
+#  - name: Import configure variables
+#    include_vars:
+#      file: configure.yaml
+
+- name: Install Satellite
+  hosts:
+    - satellite
+  roles:
+    - install-satellite
+  pre_tasks:
+  - name: Import configure variables
+    include_vars:
+      file: configure.yaml
+
+- name: Configure Satellite
+  hosts:
+    - satellite
+  roles:
+    - configure-satellite
+  pre_tasks:
+  - name: Import configure variables
+    include_vars:
+      file: configure.yaml

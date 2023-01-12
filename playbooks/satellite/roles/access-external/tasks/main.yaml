@@ -1,0 +1,17 @@
+- name: Check access to external RH URLs
+  environment:
+    SSL_CERT_FILE: "{{ item.certificate }}"
+  ansible.builtin.uri:
+    url: "{{ item.url }}"
+    status_code: "{{ item.status_code }}"
+  with_items: "{{ external_rh_urls }}"
+  tags:
+    - access-rh
+
+- name: Check access to additional repos
+  ansible.builtin.uri:
+    url: "{{ item.base_url }}/repodata/repomd.xml"
+    status_code: "200"
+  with_items: "{{ additional_repos }}"
+  tags:
+    - access-repos

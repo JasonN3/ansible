@@ -1,0 +1,7 @@
+[satellite]
+10.0.0.1 ansible_username=root
+
+[capsule]
+
+
+[testclient]

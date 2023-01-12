@@ -1,0 +1,4 @@
+external_rh_urls:
+  - url: https://cdn.redhat.com
+    certificate: "{{ playbook_dir }}/roles/access-external/files/rh_ca_cert.pem"
+    status_code: 403

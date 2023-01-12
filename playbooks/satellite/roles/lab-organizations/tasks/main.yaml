@@ -1,0 +1,59 @@
+- name: "Create Organization"
+  with_items: "{{ organizations }}"
+  organization:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    name: "{{ item }}"
+    state: present
+
+- name: "Create User"
+  with_items: "{{ accounts }}"
+  user:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    name: "workshop_{{ item }}"
+    firstname: "Workshop"
+    lastname: "User {{ item }}"
+    mail: "root@localhost"
+    description: "Workshop User {{ item }}"
+    admin: no
+    user_password: "rh2022!@"
+    default_location: "{{ location }}"
+    default_organization: "Demo_{{ item }}"
+    auth_source: Internal
+    timezone: "Central Time (US & Canada)"
+    locale: en
+    roles:
+      - Organization admin
+    locations:
+      - "{{ location }}"
+    organizations:
+      - "Demo_{{ item }}"
+    state: present
+
+- name: Add subnet to organizations
+  theforeman.foreman.subnet:
+    name: "{{ subnet.name }}"
+    network: "{{ subnet.network }}"
+    cidr: "{{ subnet.cidr }}"
+    organizations: "{{ [ default_organization ] + organizations }}"
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    state: present
+
+- name: Add Compute Resource to organizations
+  theforeman.foreman.compute_resource:
+    state: present
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    name: "{{ compute_resource.name }}"
+    organizations: "{{ [ default_organization ] + organizations }}"
+    provider: "{{ compute_resource.type }}"
