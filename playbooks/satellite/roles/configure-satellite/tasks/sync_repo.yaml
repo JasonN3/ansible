@@ -1,0 +1,8 @@
+- name: Syncing {{ item }}
+  theforeman.foreman.repository_sync:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    product: "{{ item }}"
+    organization: "{{ organization }}"

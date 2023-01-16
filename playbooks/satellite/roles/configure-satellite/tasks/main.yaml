@@ -157,15 +157,29 @@
     - syncplan
     - "4"
 
+- name: Get all enabled repositories
+  theforeman.foreman.resource_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    resource: repositories
+    organization: "{{ organization }}"
+  register: repositories
+  tags:
+    - sync
+
 - name: Sync the repositories (very long process)
   theforeman.foreman.repository_sync:
     username: "{{ admin_username }}"
     password: "{{ admin_password }}"
     server_url: "https://localhost"
     validate_certs: false
-    product: "{{ item }}"
+    product: "{{ item.product }}"
+    repository: "{{ item.name }}"
     organization: "{{ organization }}"
-  with_items: "{{ products | json_query('resources[?repository_count > `0`].name') }}"
+  with_items: "{{ repositories | json_query('resources[?content_type == `yum`].{ name: name, product: product.name }') }}"
+  ignore_errors: true
   tags:
     - sync
 
@@ -312,9 +326,9 @@
     server_url: "https://localhost"
     validate_certs: false
     name: Patch Machines
-    file_name: jobs/patch.yaml
+    file_name: "{{ role_path }}/files/jobs/patch.yaml"
     state: present
     locations:
-    - {{ location }}
+    - "{{ location }}"
     organizations:
-    - {{ organization }}
+    - "{{ organization }}"

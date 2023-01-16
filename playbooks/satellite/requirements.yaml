@@ -1,3 +1,4 @@
 collections:
   - name: theforeman.foreman
   - name: community.general
+  - name: ansible.posix
