@@ -1,0 +1,57 @@
+---
+- name: Check if persistent variables file exists
+  delegate_to: localhost
+  stat:
+    path: "{{ playbook_dir }}/persistent.yaml"
+  register: persistent_exists
+  tags:
+    - always
+
+- name: Import persistent variables
+  when: persistent_exists.stat.exists
+  include_vars:
+    file: "{{ playbook_dir }}/persistent.yaml"
+  tags:
+    - always
+
+- name: Install Manifest
+  include_tasks: "{{ role_path }}/tasks/manifest.yaml"
+
+- name: Enable Reposets and Add Custom Repos
+  include_tasks: "{{ role_path }}/tasks/enable_reposets.yaml"
+
+- name: Create Daily Syncplan
+  include_tasks: "{{ role_path }}/tasks/syncplan.yaml"
+
+- name: Sync all repos
+  include_tasks: "{{ role_path }}/tasks/sync.yaml"
+
+- name: Create Lifecycles
+  include_tasks: "{{ role_path }}/tasks/lifecycles.yaml"
+
+- name: Create Content Views
+  include_tasks: "{{ role_path }}/tasks/contentviews.yaml"
+
+- name: Configure Compute Resources
+  include_tasks: "{{ role_path }}/tasks/computeresources.yaml"
+
+- name: Create Host Groups
+  include_tasks: "{{ role_path }}/tasks/hostgroups.yaml"
+    
+- name: Configure Subnets
+  include_tasks: "{{ role_path }}/tasks/subnets.yaml"
+
+- name: Demo management
+  set_facts:
+    curr_plays: "{{ always_ansible_plays + demo_ansible_plays }}"
+    curr_roles: "{{ always_ansible_roles + demo_ansible_roles }}"
+    curr_puppet: "{{ always_puppet + demo_puppet }}"
+
+- name: Prod management
+  set_facts:
+    curr_plays: "{{ always_ansible_plays + prod_ansible_plays }}"
+    curr_roles: "{{ always_ansible_roles + prod_ansible_roles }}"
+    curr_puppet: "{{ always_puppet + prod_puppet }}"
+
+- name: Configure Ansible & Puppet for client management
+  include_tasls: "{{ role_path }}/tasks/management.yaml"

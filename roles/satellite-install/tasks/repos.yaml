@@ -1,0 +1,33 @@
+---
+
+- name: Enable Red Hat Satellite subscription
+  when: activation['activation_key'] is defined or activation['username'] is defined
+  redhat_subscription:
+    state: present
+    activationkey: "{{ activation.activation_key | default(omit) }}"
+    org_id: "{{ activation.org_id | default(omit) }}"
+    username: "{{ activation.username | default(omit) }}"
+    password: "{{ activation.password | default(omit) }}"
+    pool: '^Red Hat Satellite.*$'
+  tags:
+    - install-repos
+    - subscribe
+
+- name: Enable Repos for RHEL 8
+  become: true
+  when: ansible_distribution_major_version == "8"
+  rhsm_repository:
+    purge: yes
+    name: "{{ repos8 }}"
+  tags:
+    - install-repos
+    - sat-repos
+
+- name: Enable RHEL 8 modules
+  become: true
+  when: ansible_distribution_major_version == "8"
+  command:
+    cmd: "dnf module enable -y {{ modules8 | join(' ') }}"
+  tags:
+    - install-repos
+    - sat-repos-modules

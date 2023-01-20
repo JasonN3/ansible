@@ -3,7 +3,7 @@
 /playbooks/satellite/persistent.yaml
 /playbooks/satellite/configure.yaml
 /playbooks/satellite/lab-configure.yaml
-/playbooks/satellite/inventory
+/playbooks/satellite/inventory.ini
 test_*
 
 TODO.txt

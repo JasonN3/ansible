@@ -1,0 +1,40 @@
+---
+
+- name: Check if persistent variables file exists
+  delegate_to: localhost
+  stat:
+    path: "{{ playbook_dir }}/persistent.yaml"
+  register: persistent_exists
+  tags:
+    - always
+
+- name: Import persistent variables
+  when: persistent_exists.stat.exists
+  include_vars:
+    file: "{{ playbook_dir }}/persistent.yaml"
+  tags:
+    - always
+
+- name: Check Prerequisites
+  include_tasks: "{{ role_path }}/tasks/pre-reqs.yaml"
+
+- name: Enable Repositories
+  include_tasks: "{{ role_path }}/tasks/repos.yaml"
+
+- name: Install Dependencies
+  include_tasks: "{{ role_path }}/tasks/dependencies.yaml"
+
+
+- name: Update all packages
+  become: true
+  package:
+    name: '*'
+    state: latest
+  tags:
+    - install-update
+
+- name: Install Satellite
+  include_tasks: "{{ role_path }}/tasks/install.yaml"
+
+- name: Configure Firewalld
+  include_tasks: "{{ role_path }}/tasks/firewall.yaml"

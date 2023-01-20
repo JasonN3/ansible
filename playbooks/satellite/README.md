@@ -1,12 +1,15 @@
 # Install RH Satellite
 ## Steps
 1. Install ansible-core. All other requirements will be installed as part of run.sh
-1. Fill out the inventory file with the infrastructure information  
+1. Copy inventory.example.ini to inventory.ini and fill out the inventory file with the infrastructure information  
    Group Information:
    - satellite (required): This should contain 1 server that will host the Satellite server.
    - capsule (optional): This should contain the Capsule servers.
    - testclient (optional): If specified, tests will be run from these servers to ensure communication back to the Satellite/Capsule servers. Override the variable "capsule_server" to specify the test should target a Capsule server instead of the Satellite server.
-1. Copy `configure.yaml.example` to `configure.yaml` and configure your information
+1. Copy `configure.example.yaml` to `configure.yaml` and configure your information
+   - Items within REQUIRED are required in order for the installation to complete and the features to function
+   - Items within RECOMMENDED are recommended in order to utilize more of Satellite's features
+   - Items within OPTIONAL are items that can be customized to your needs but are not needed for the initial configuration
 1. Run `run.sh`  
    Any addition arguments will be passed to `ansible-playbook`
 

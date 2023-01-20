@@ -1,0 +1,36 @@
+- name: Check for manifest file
+  when: manifest_file is defined and manifest_file != ""
+  delegate_to: localhost
+  stat:
+    path: "{{ manifest_file }}"
+  register: manifest_exists
+  tags: 
+    - configure-manifest
+
+- name: Fail if manifest file doesn't exist
+  when: manifest_file is not defined or manifest_file == "" or manifest_exists.stat.exists == false
+  fail:
+    msg: Manifest file must be defined and exist
+  tags:
+    - configure-manifest
+
+- name: Copy manifest to Satellite server
+  become: true
+  copy:
+    src: "{{ manifest_file }}"
+    dest: "/root/manifest.zip"
+  tags:
+    - configure-manifest
+
+- name: Add Subscription Manifest
+  become: true
+  theforeman.foreman.subscription_manifest:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    state: present
+    manifest_path: "/root/manifest.zip"
+  tags:
+    - configure-manifest

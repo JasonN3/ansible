@@ -1,0 +1,17 @@
+---
+
+- name: Create host groups
+  theforeman.foreman.hostgroup:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "{{ item.name }}"
+    architecture: "x86_64"
+    state: present
+    parent: "{{ item.parent | default(omit) }}"
+    lifecycle_environment: "{{ item.lifecycle | default(omit) }}"
+  loop: "{{ host_groups }}"
+  tags:
+    - hostgroups

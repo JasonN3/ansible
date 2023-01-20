@@ -1,0 +1,22 @@
+---
+
+- name: Install Required Packages - Common
+  become: true
+  package: 
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ packages + satellite_packages }}"
+  tags:
+    - install-depends
+    - common-packages
+
+- name: Install Required Packages - RHEL 8
+  become: true
+  package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ packages8 }}"
+  when: ansible_distribution_major_version == "8"
+  tags:
+    - install-depends
+    - rhel8-packages

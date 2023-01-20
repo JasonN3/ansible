@@ -1,0 +1,46 @@
+supported_os:
+  - "8"
+
+satellite_version: "6.12"
+
+repos7:
+  - rhel-{{ ansible_distribution_major_version }}-server-rpms
+  - rhel-{{ ansible_distribution_major_version }}-server-satellite-{{ satellite_version }}-rpms
+  - rhel-{{ ansible_distribution_major_version }}-server-satellite-maintenance-6-rpms
+  - rhel-server-rhscl-{{ ansible_distribution_major_version }}-rpms
+  - rhel-{{ ansible_distribution_major_version }}-server-ansible-{{ ansiblerepo_version }}-rpms
+
+repos8:
+  - rhel-{{ ansible_distribution_major_version }}-for-x86_64-baseos-rpms
+  - rhel-{{ ansible_distribution_major_version }}-for-x86_64-appstream-rpms
+  - satellite-{{ satellite_version }}-for-rhel-{{ ansible_distribution_major_version }}-x86_64-rpms
+  - satellite-maintenance-{{ satellite_version }}-for-rhel-{{ ansible_distribution_major_version }}-x86_64-rpms
+
+modules8:
+  - "satellite:el8"
+
+useful_features:
+  - enable-puppet
+  - enable-foreman-cli-puppet
+  - foreman-proxy-puppet=true
+  - foreman-proxy-puppetca=true
+  - foreman-proxy-content-puppet=true
+  - puppet-server=true
+  - enable-foreman-plugin-bootdisk
+  - foreman-proxy-httpboot=true
+  - foreman-proxy-http=true
+  - enable-foreman-plugin-puppet
+  - enable-foreman-proxy-plugin-ansible
+  - foreman-proxy-templates=true
+  - puppet-server-foreman-ssl-ca=/etc/pki/katello/puppet/puppet_client_ca.crt
+  - puppet-server-foreman-ssl-cert=/etc/pki/katello/puppet/puppet_client.crt
+  - puppet-server-foreman-ssl-key=/etc/pki/katello/puppet/puppet_client.key
+
+external_rh_urls:
+  - url: https://cdn.redhat.com
+    certificate: "{{ role_path }}/files/rh_ca_cert.pem"
+    status_code: 403
+
+satellite_packages:
+  - sos
+  - satellite

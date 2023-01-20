@@ -1,0 +1,41 @@
+---
+
+- name: Create all Ansible role directories
+  file:
+    path: "/etc/ansible/roles/{{ item | dirname }}"
+    state: directory
+
+- name: Copy Ansible roles
+  with_items: "{{ curr_roles }}"
+  ansible.builtin.copy:
+    src: "{{role_path}}/files/ansible/roles/{{ item }}"
+    dest: "/etc/ansible/roles/{{ item }}"
+
+- name: Create Ansible Jobs
+  with_items: "{{ curr_plays }}"
+  theforeman.foreman.job_template:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    name: "{{ item.name }}"
+    file_name: "{{ role_path }}/files/ansible/playbooks/{{ item.file }}"
+    state: present
+    locations:
+    - "{{ location }}"
+    organizations:
+    - "{{ organization }}"
+
+- name: Create all Puppet module directories
+  with_items: "{{ curr_puppet }}"
+  file:
+    path: "/etc/puppetlabs/code/environments/production/modules/{{ item }}"
+    state: directory
+
+- name: Copy Puppet modules
+  with_items: "{{ curr_puppet }}"
+  ansible.builtin.copy:
+    src: "{{ role_path}}/files/puppet/modules/{{ item }}"
+    dest: "/etc/puppetlabs/code/environments/production/modules/{{ item }}"
+
+

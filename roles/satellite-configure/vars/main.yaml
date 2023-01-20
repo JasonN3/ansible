@@ -1,0 +1,34 @@
+recommended_repos:
+  - rhel-8-for-x86_64-baseos-rpms
+  - rhel-8-for-x86_64-appstream-rpms
+  - rhel-8-for-x86_64-baseos-kickstart
+  - rhel-8-for-x86_64-appstream-kickstart
+  - rhel-9-for-x86_64-baseos-rpms
+  - rhel-9-for-x86_64-appstream-rpms
+  - rhel-9-for-x86_64-baseos-kickstart
+  - rhel-9-for-x86_64-appstream-kickstart
+  - satellite-client-6-for-rhel-8-x86_64-rpms
+  - satellite-client-6-for-rhel-9-x86_64-rpms
+
+always_ansible_plays:
+  - name: Patch Machines
+    file: patch_rhel/patch.yaml
+
+always_ansible_roles: []
+
+always_puppet: []
+
+demo_ansible_plays: []
+
+demo_ansible_roles:
+  - httpd
+
+demo_puppet:
+  - demo_webserver
+
+prod_ansible_plays: []
+
+prod_ansible_roles: []
+
+prod_puppet:
+  - domain_join
