@@ -42,16 +42,16 @@
   include_tasks: "{{ role_path }}/tasks/subnets.yaml"
 
 - name: Demo management
-  set_facts:
+  set_fact:
     curr_plays: "{{ always_ansible_plays + demo_ansible_plays }}"
     curr_roles: "{{ always_ansible_roles + demo_ansible_roles }}"
     curr_puppet: "{{ always_puppet + demo_puppet }}"
 
 - name: Prod management
-  set_facts:
+  set_fact:
     curr_plays: "{{ always_ansible_plays + prod_ansible_plays }}"
     curr_roles: "{{ always_ansible_roles + prod_ansible_roles }}"
     curr_puppet: "{{ always_puppet + prod_puppet }}"
 
 - name: Configure Ansible & Puppet for client management
-  include_tasls: "{{ role_path }}/tasks/management.yaml"
+  include_tasks: "{{ role_path }}/tasks/management.yaml"

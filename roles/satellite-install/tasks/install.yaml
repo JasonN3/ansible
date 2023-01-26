@@ -98,7 +98,7 @@
       set_fact:
         admin_password: "{{ gen_password }}"
 
-- name: Install Satellite
+- name: Install Satellite (Output is visible at /var/log/foreman-installer/satellite.log on the Satellite server)
   become: true
   command:
     cmd: satellite-installer --scenario satellite {{ extra_args }} --foreman-initial-organization {{ organization | quote }} --foreman-initial-location {{ location | quote }} --foreman-initial-admin-username {{ admin_username | quote }} --foreman-initial-admin-password {{ admin_password | quote }}
@@ -106,7 +106,7 @@
     - install-satellite
 
 - name: Install redhat-access-insights-puppet
-  when: useful_features contains "puppet-server=true"
+  when: '"puppet-server=true" in useful_features'
   become: true
   ansible.builtin.dnf:
     name: redhat-access-insights-puppet

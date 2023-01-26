@@ -27,19 +27,16 @@
     - install-prereqs
     - sat_dns
 
-- name: Debug
-  debug:
-    var: sat_host
-  tags:
-    - install-prereqs
-    - sat_dns
+- name: Forward and Reverse DNS records must exist or host must be defined in /etc/hosts
+  when: (sat_dns == '' or sat_dns == 'NXDOMAIN') and (sat_host.found == 0)
+  fail:
+    message: Host not found in dns or /etc/hosts
 
 - name: Check access to external RH URLs
-  environment:
-    SSL_CERT_FILE: "{{ item.certificate }}"
   ansible.builtin.uri:
     url: "{{ item.url }}"
     status_code: "{{ item.status_code }}"
+    validate_certs: no
   with_items: "{{ external_rh_urls }}"
   tags:
     - install-prereqs
@@ -81,7 +78,7 @@
 
 - name: Pausing to allow server to shutdown and terminate our SSH connection
   when: selinux_changed.changed
-  pause: seconds=30
+  pause: seconds=10
   tags:
     - install-prereqs
     - selinux

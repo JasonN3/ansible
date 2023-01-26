@@ -7,14 +7,14 @@
   pre_tasks:
   - name: Import configure variables
     include_vars:
-      file: configure.yaml
+      file: "{{ CONFIG }}"
 
 - name: Configure Satellite
   hosts:
     - satellite
   roles:
-    - configure-satellite
+    - satellite-configure
   pre_tasks:
   - name: Import configure variables
     include_vars:
-      file: configure.yaml
+      file: "{{ CONFIG }}"

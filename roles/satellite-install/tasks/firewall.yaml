@@ -5,28 +5,28 @@
   register: service_facts
 
 - name: Add RH-Satellite-6 service to firewalld
-  when: service_facts.ansible_facts.services['firewalld.service']['state'] == 'running'
+  when: service_facts.ansible_facts.services['firewalld.service'] is defined and service_facts.ansible_facts.services['firewalld.service']['state'] == 'running'
   ansible.posix.firewalld:
     service: RH-Satellite-6
     permanent: yes
     state: enabled
 
 - name: Add RH-Satellite-6 service to running firewalld
-  when: service_facts.ansible_facts.services['firewalld.service']['state'] == 'running'
+  when: service_facts.ansible_facts.services['firewalld.service'] is defined and service_facts.ansible_facts.services['firewalld.service']['state'] == 'running'
   ansible.posix.firewalld:
     service: RH-Satellite-6
     permanent: no
     state: enabled
 
 - name: Add dhcp to firewalld
-  when: service_facts.ansible_facts.services['dhcpd']['state'] == 'running'
+  when: service_facts.ansible_facts.services['dhcpd.service'] is defined and service_facts.ansible_facts.services['dhcpd.service']['state'] == 'running'
   ansible.posix.firewalld:
     service: dhcp
-    permanent: yes``
+    permanent: yes
     state: enabled
 
 - name: Add dhcp to running firewalld
-  when: service_facts.ansible_facts.services['dhcpd']['state'] == 'running'
+  when: service_facts.ansible_facts.services['dhcpd.service'] is defined and service_facts.ansible_facts.services['dhcpd.service']['state'] == 'running'
   ansible.posix.firewalld:
     service: dhcp
     permanent: no

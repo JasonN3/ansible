@@ -33,6 +33,20 @@
   tags:
     - install-update
 
+- name: Check if a restart is required
+  ansible.builtin.command:
+    cmd: needs-restarting -r
+  register: needsrestart
+  ignore_errors: true
+  tags:
+    - install-update
+
+- name: Reboot server
+  when: needsrestart == 1
+  ansible.builtin.reboot:
+  tags:
+    - install-update
+
 - name: Install Satellite
   include_tasks: "{{ role_path }}/tasks/install.yaml"
 
