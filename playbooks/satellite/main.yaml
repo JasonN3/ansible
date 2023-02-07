@@ -8,6 +8,8 @@
   - name: Import configure variables
     include_vars:
       file: "{{ CONFIG }}"
+    tags:
+      - always
 
 - name: Configure Satellite
   hosts:
@@ -18,3 +20,5 @@
   - name: Import configure variables
     include_vars:
       file: "{{ CONFIG }}"
+    tags:
+      - always

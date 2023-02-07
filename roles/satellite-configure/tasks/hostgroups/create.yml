@@ -1,0 +1,29 @@
+---
+
+- name: Create Hostgroup
+  theforeman.foreman.hostgroup:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "{{ part }}"
+    architecture: "x86_64"
+    state: present
+    parent: "{{ parent | default(omit) }}"
+  tags:
+    - hostgroups
+
+- name: Append parent
+  when: parent != ""
+  set_fact:
+    parent: "{{ parent }}/{{ part }}"
+  tags:
+    - hostgroups
+
+- name: Set parent
+  when: parent == ""
+  set_fact:
+    parent: "{{ part }}"
+  tags:
+    - hostgroups

@@ -12,6 +12,9 @@
     src: "{{role_path}}/files/ansible/roles/{{ item }}"
     dest: "/etc/ansible/roles/{{ item }}"
 
+#- name: Sync Ansible roles
+#  
+
 - name: Create all Ansible playbook directories
   with_items: "{{ curr_plays }}"
   file:
@@ -38,17 +41,3 @@
     - "{{ location }}"
     organizations:
     - "{{ organization }}"
-
-#- name: Create all Puppet module directories
-#  with_items: "{{ curr_puppet }}"
-#  file:
-#    path: "/etc/puppetlabs/code/environments/production/modules/{{ item }}"
-#    state: directory
-
-#- name: Copy Puppet modules
-#  with_items: "{{ curr_puppet }}"
-#  ansible.builtin.copy:
-#    src: "{{ role_path}}/files/puppet/modules/{{ item }}"
-#    dest: "/etc/puppetlabs/code/environments/production/modules/{{ item }}"
-
-

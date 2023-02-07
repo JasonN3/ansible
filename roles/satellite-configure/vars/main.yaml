@@ -21,7 +21,7 @@ always_puppet: []
 demo_ansible_plays: []
 
 demo_ansible_roles:
-  - demo-web_health
+  - httpd
 
 demo_puppet:
   - demo_webserver

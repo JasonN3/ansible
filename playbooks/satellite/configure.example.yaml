@@ -109,6 +109,11 @@ compute_resources: []
 #      password: secret
 #      datacenter: ax01
 
+# Deployment type
+# demo: configure for a demo environment
+# prod: configure for a non-demo environment
+deployment: demo
+
 ##################################################################################################
 ############################################ OPTIONAL ############################################
 ##################################################################################################

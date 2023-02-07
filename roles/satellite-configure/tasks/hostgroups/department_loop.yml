@@ -1,0 +1,21 @@
+---
+
+- name: Clean up hostgroup name
+  set_fact: 
+    hostgroup_clean: "{{ hostgroup | replace('[', '.') | replace(\"'\", '') | replace(']', '') | replace('.', '/') }}"
+  tags:
+    - hostgroups
+
+- name: Create department list
+  set_fact:
+    hostgroup_departments: "{{ [hostgroup_clean] | product(departments) | map('join', '/') }}"
+  tags:
+    - hostgroups
+
+- name: Append lifecycle list
+  include_tasks: "{{ role_path }}/tasks/hostgroups/environment_loop.yml"
+  loop: "{{ hostgroup_departments }}"
+  loop_control:
+    loop_var: hostgroup_department
+  tags:
+    - hostgroups

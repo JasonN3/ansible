@@ -1,0 +1,21 @@
+---
+
+- name: Set groupname
+  set_fact:
+    groupname: "{{ hostgroup_department }}/{{ department }}-{{ lifecycle }}"
+  tags:
+    - hostgroups
+
+- name: Reset parent var
+  set_fact:
+    parent: ""
+  tags:
+    - hostgroups
+
+- name: Split parent groups
+  include_tasks: "{{ role_path }}/tasks/hostgroups/create.yml"
+  loop: "{{ groupname | split('/') }}"
+  loop_control:
+    loop_var: part
+  tags:
+    - hostgroups

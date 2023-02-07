@@ -1,0 +1,8 @@
+:cachedir: /opt/puppetlabs/server/data/puppetserver/r10k-cache
+
+:sources:
+{% for source in puppet_sources %}
+  :{{ source.name }}:
+    remote: {{ source.remote }}
+    basedir: {{ source.basedir}}
+{% endfor %}

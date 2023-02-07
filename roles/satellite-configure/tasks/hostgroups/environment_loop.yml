@@ -1,0 +1,15 @@
+---
+
+- name: Extract department
+  set_fact:
+    department: "{{ (hostgroup_department | split('/'))[-1] }}"
+  tags:
+    - hostgroups
+
+- name: Create hostgroups including parents
+  include_tasks: "{{ role_path }}/tasks/hostgroups/split.yml"
+  loop: "{{ lifecycles | json_query('[].name') }}"
+  loop_control:
+    loop_var: lifecycle
+  tags:
+    - hostgroups

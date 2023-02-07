@@ -85,3 +85,8 @@ subnets: []
 #   domains:
 #   - "domain1"
 #   - "domain2"
+
+# Defined location for R10k to sync for Puppet environments
+puppet_sources: {}
+#  - name: github-jasonn3
+#    remote: https://github.com/JasonN3/puppet_modules.git

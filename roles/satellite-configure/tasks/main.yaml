@@ -35,23 +35,31 @@
 - name: Configure Compute Resources
   include_tasks: "{{ role_path }}/tasks/computeresources.yaml"
 
+# If you're reading this, I'm sorry. Writing recursion without variable scoping is complicated.
 - name: Create Host Groups
   include_tasks: "{{ role_path }}/tasks/hostgroups.yaml"
+  tags:
+    - hostgroups
     
 - name: Configure Subnets
   include_tasks: "{{ role_path }}/tasks/subnets.yaml"
 
 - name: Demo management
+  when: deployment == 'demo'
   set_fact:
     curr_plays: "{{ always_ansible_plays + demo_ansible_plays }}"
     curr_roles: "{{ always_ansible_roles + demo_ansible_roles }}"
     curr_puppet: "{{ always_puppet + demo_puppet }}"
 
 - name: Prod management
+  when: deployment == 'prod'
   set_fact:
     curr_plays: "{{ always_ansible_plays + prod_ansible_plays }}"
     curr_roles: "{{ always_ansible_roles + prod_ansible_roles }}"
     curr_puppet: "{{ always_puppet + prod_puppet }}"
 
-- name: Configure Ansible & Puppet for client management
-  include_tasks: "{{ role_path }}/tasks/management.yaml"
+- name: Configure Ansible for client management
+  include_tasks: "{{ role_path }}/tasks/ansible.yaml"
+
+- name: Configure Puppet for client management
+  include_tasks: "{{ role_path }}/tasks/puppet.yaml"
