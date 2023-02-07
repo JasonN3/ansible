@@ -33,27 +33,14 @@ lifecycles:
 
 # Host groups to create
 host_groups:
-  - name: General
-  - parent: General
-    name: Domain
-  - parent: General
-    name: Non-Domain
-  - parent: General/Domain
-    name: "Department1"
-  - parent: General/Domain/Department1
-    name: "Department1-Dev"
-    lifecycle: Dev
-  - parent: General/Domain/Department1
-    name: "Department1-Prod"
-    lifecycle: Prod
-  - parent: General/Non-Domain
-    name: "Department2"
-  - parent: General/Non-Domain/Department2
-    name: "Department2-Dev"
-    lifecycle: Dev
-  - parent: General/Non-Domain/Department2
-    name: "Department2-Prod"
-    lifecycle: Prod
+  General:
+    Domain: {}
+    Non-Domain: {}
+
+# Departments to nest within the host groups
+departments:
+  - Department1
+  - Department2
 
 subnets: []
 # - name: NAME
