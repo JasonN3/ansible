@@ -34,36 +34,15 @@
         name: '*'
         state: latest
 
-    - name: Reboot if Necessary
+    - name: check to see if we need a reboot
       when: reboot == 'auto'
-      block:
-      - name: check to see if we need a reboot
-        command: needs-restarting -r
-        register: result
-        ignore_errors: yes
+      command: needs-restarting -r
+      register: result
+      ignore_errors: yes
 
-      - name: Reboot Server if Necessary
-        ansible.builtin.reboot:
-        when: result.rc == 1
-
-      - name: Pausing to allow server to shutdown and terminate our SSH connection
-        pause: seconds=30
-        when: result.rc == 1
-
-      - name: Wait for reboot to complete and SSH to become available
-        ansible.builtin.wait_for_connection:
-
-    - name: Always Reboot
-      when: reboot == 'always'
-      block:
-      - name: Reboot Server if Necessary
-        ansible.builtin.reboot:
-
-      - name: Pausing to allow server to shutdown and terminate our SSH connection
-        pause: seconds=30
-
-      - name: Wait for reboot to complete and SSH to become available
-        ansible.builtin.wait_for_connection:
+    - name: Reboot Server
+      ansible.builtin.reboot:
+      when: reboot == 'always' or result.rc == 1
 
     - name: Apply all assigned roles
       include_role:
