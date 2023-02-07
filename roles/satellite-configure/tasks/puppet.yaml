@@ -4,15 +4,24 @@
   community.general.gem:
     name: r10k
     user_install: false
+  tags:
+    - satellite-configure
+    - satellite-configure-puppet
 
 - name: Clone general modules
   ansible.builtin.git:
     repo: 'https://github.com/JasonN3/puppet_modules.git'
     dest: /etc/puppetlabs/code/modules/
     version: main
+  tags:
+    - satellite-configure
+    - satellite-configure-puppet
 
 - name: Configure r10k
   when: puppet_sources is defined and puppet_sources != {}
+  tags:
+    - satellite-configure
+    - satellite-configure-puppet
   block:
   - name: Write R10k configuration file
     ansible.builtin.template:
@@ -40,4 +49,7 @@
     server_url: "https://localhost"
     validate_certs: false
     smart_proxy: "{{ ansible_fqdn }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-puppet
 

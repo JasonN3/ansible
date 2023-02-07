@@ -3,6 +3,9 @@
 - name: Get service information
   ansible.builtin.service_facts:
   register: service_facts
+  tags:
+    - satellite-install
+    - satellite-install-firewall
 
 - name: Add RH-Satellite-6 service to firewalld
   when: service_facts.ansible_facts.services['firewalld.service'] is defined and service_facts.ansible_facts.services['firewalld.service']['state'] == 'running'
@@ -10,6 +13,9 @@
     service: RH-Satellite-6
     permanent: yes
     state: enabled
+  tags:
+    - satellite-install
+    - satellite-install-firewall
 
 - name: Add RH-Satellite-6 service to running firewalld
   when: service_facts.ansible_facts.services['firewalld.service'] is defined and service_facts.ansible_facts.services['firewalld.service']['state'] == 'running'
@@ -17,6 +23,9 @@
     service: RH-Satellite-6
     permanent: no
     state: enabled
+  tags:
+    - satellite-install
+    - satellite-install-firewall
 
 - name: Add dhcp to firewalld
   when: service_facts.ansible_facts.services['dhcpd.service'] is defined and service_facts.ansible_facts.services['dhcpd.service']['state'] == 'running'
@@ -24,6 +33,9 @@
     service: dhcp
     permanent: yes
     state: enabled
+  tags:
+    - satellite-install
+    - satellite-install-firewall
 
 - name: Add dhcp to running firewalld
   when: service_facts.ansible_facts.services['dhcpd.service'] is defined and service_facts.ansible_facts.services['dhcpd.service']['state'] == 'running'
@@ -31,3 +43,6 @@
     service: dhcp
     permanent: no
     state: enabled
+  tags:
+    - satellite-install
+    - satellite-install-firewall

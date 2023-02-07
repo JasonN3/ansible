@@ -10,8 +10,8 @@
     password: "{{ activation.password | default(omit) }}"
     pool: '^Red Hat Satellite.*$'
   tags:
-    - install-repos
-    - subscribe
+    - satellite-install
+    - satellite-install-repos
 
 - name: Enable Repos for RHEL 8
   become: true
@@ -20,8 +20,8 @@
     purge: yes
     name: "{{ repos8 }}"
   tags:
-    - install-repos
-    - sat-repos
+    - satellite-install
+    - satellite-install-repos
 
 - name: Enable RHEL 8 modules
   become: true
@@ -29,5 +29,5 @@
   command:
     cmd: "dnf module enable -y {{ modules8 | join(' ') }}"
   tags:
-    - install-repos
-    - sat-repos-modules
+    - satellite-install
+    - satellite-install-repos

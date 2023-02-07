@@ -29,3 +29,6 @@
     server_url: "https://localhost"
     validate_certs: false
     state: present
+  tags:
+    - satellite-configure
+    - satellite-configure-subnets

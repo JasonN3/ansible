@@ -4,13 +4,15 @@
   set_fact:
     groupname: "{{ hostgroup_department }}/{{ department }}-{{ lifecycle }}"
   tags:
-    - hostgroups
+    - satellite-configure
+    - satellite-configure-hostgroups
 
 - name: Reset parent var
   set_fact:
     parent: ""
   tags:
-    - hostgroups
+    - satellite-configure
+    - satellite-configure-hostgroups
 
 - name: Split parent groups
   include_tasks: "{{ role_path }}/tasks/hostgroups/create.yml"
@@ -18,4 +20,5 @@
   loop_control:
     loop_var: part
   tags:
-    - hostgroups
+    - satellite-configure
+    - satellite-configure-hostgroups

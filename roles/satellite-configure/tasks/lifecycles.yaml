@@ -13,4 +13,5 @@
     state: "present"
   with_items: "{{ lifecycles }}"
   tags:
-    - lifecycle
+    - satellite-configure
+    - satellite-configure-lifecycles

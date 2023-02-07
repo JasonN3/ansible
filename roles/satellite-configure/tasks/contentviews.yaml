@@ -11,7 +11,8 @@
   with_items: "{{ products | json_query('resources[?repository_count > `0`].name') }}"
   register: all_repos
   tags:
-    - content_view
+    - satellite-configure
+    - satellite-configure-contentviews
 
 - name: Create Everything Content View
   theforeman.foreman.content_view:
@@ -24,7 +25,8 @@
     repositories: "{{ (all_repos | json_query('results[*].repositories[*].{ name: name, product: product.name }'))[0] }}"
   register: CV_changed
   tags:
-    - content_view
+    - satellite-configure
+    - satellite-configure-contentviews
 
 - name: Publish new version of Everything Content View
   when: CV_changed.changed
@@ -38,4 +40,5 @@
     lifecycle_environments:
       - Library
   tags:
-    - content_view
+    - satellite-configure
+    - satellite-configure-contentviews

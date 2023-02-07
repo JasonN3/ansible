@@ -5,15 +5,17 @@
     msg: OS version is not supported. Only RHEL {{ supported_os | join(', ') }} are supported
   when: ansible_distribution_major_version not in supported_os
   tags:
-    - install-prereqs
-    - verify-os
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-os
 
 - name: Check for Satellite server DNS record
   set_fact:
     sat_dns: "{{ lookup('community.general.dig', 'example.com.')}}"
   tags:
-    - install-prereqs
-    - sat_dns
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-dns
 
 - name: Check Satellite host file
   when: sat_dns == '' or sat_dns == 'NXDOMAIN'
@@ -24,13 +26,18 @@
   check_mode: yes
   register: sat_host
   tags:
-    - install-prereqs
-    - sat_dns
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-dns
 
 - name: Forward and Reverse DNS records must exist or host must be defined in /etc/hosts
   when: (sat_dns == '' or sat_dns == 'NXDOMAIN') and (sat_host.found == 0)
   fail:
     message: Host not found in dns or /etc/hosts
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-dns
 
 - name: Check access to external RH URLs
   ansible.builtin.uri:
@@ -39,8 +46,9 @@
     validate_certs: no
   with_items: "{{ external_rh_urls }}"
   tags:
-    - install-prereqs
-    - access-rh
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-accessrh
 
 - name: Check access to additional repos
   ansible.builtin.uri:
@@ -48,16 +56,18 @@
     status_code: "200"
   with_items: "{{ additional_repos }}"
   tags:
-    - install-prereqs
-    - access-repos
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-accessrepos
 
 - name: SELinux cannot be disabled
   when: selinux | lower == "disabled"
   fail:
     msg: "SELinux cannot be set to disabled"
   tags:
-    - install-prereqs
-    - selinux
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-selinux
 
 - name: Ensure selinux is not disabled
   ansible.builtin.lineinfile:
@@ -66,26 +76,33 @@
     line: "SELINUX={{ selinux }}"
   register: selinux_changed
   tags:
-    - install-prereqs
-    - selinux
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-selinux
 
 - name: Reboot server
   when: selinux_changed.changed
   ansible.builtin.reboot:
   tags:
-    - install-prereqs
-    - selinux
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-selinux
+    - satellite-install-prereqs-selinux-reboot
 
 - name: Pausing to allow server to shutdown and terminate our SSH connection
   when: selinux_changed.changed
   pause: seconds=10
   tags:
-    - install-prereqs
-    - selinux
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-selinux
+    - satellite-install-prereqs-selinux-reboot
 
 - name: Wait for reboot to complete and SSH to become available
   when: selinux_changed.changed
   ansible.builtin.wait_for_connection:
   tags:
-    - install-prereqs
-    - selinux
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-selinux
+    - satellite-install-prereqs-selinux-reboot

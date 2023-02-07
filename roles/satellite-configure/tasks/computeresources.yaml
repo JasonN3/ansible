@@ -16,4 +16,5 @@
     provider_params: "{{ item.provider_params }}"
   loop: "{{ compute_resources }}"
   tags:
-    - compute_resources
+    - satellite-configure
+    - satellite-configure-computeresources

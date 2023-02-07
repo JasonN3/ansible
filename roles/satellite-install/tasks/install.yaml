@@ -3,6 +3,8 @@
 - name: Stage variables
   set_fact:
     extra_args: ""
+  tags:
+    - always
 
 - name: Enable Compute Resources
   when: '"--enable-foreman-compute-{{ item.type }}" not in extra_args'
@@ -10,12 +12,14 @@
     extra_args: "{{ extra_args }} --enable-foreman-compute-{{ item.type }}"
   with_items: "{{ compute_resources }}"
   tags:
-    - compute
+    - satellite-install
+    - satellite-install-computeresources
 
 - name: Check certificate requirements
   when: certificate is defined and certificate != {}
   tags:
-    - custom-certificate
+    - satellite-install
+    - satellite-install-certificate
   block:
   - name: Check cert_file
     when: certificate.cert_file is not defined or certificate.cert_file == ""
@@ -66,20 +70,25 @@
     extra_args: "{{ extra_args }} --{{ item }}"
   with_items: "{{ useful_features }}"
   tags:
-    - useful-features
+    - satellite-install
+    - satellite-install-usefulfeatures
 
 - name: Set additional features
   set_fact:
     extra_args: "{{ extra_args }} --{{ item }}"
   with_items: "{{ additional_features }}"
   tags:
-    - additional-features
+    - satellite-install
+    - satellite-install-additionalfeatures
 
 # TODO: If DHCP and DNS, set DHCP option for DNS
 # --foreman-proxy-dhcp-nameservers {{ self-ip }}
 
 - name: Generate and save admin password
   when: admin_password is not defined or admin_password == ""
+  tags:
+    - satellite-install
+    - satellite-install-genpassword
   block:
     - name: Generate random password
       set_fact:
@@ -103,7 +112,8 @@
   command:
     cmd: satellite-installer --scenario satellite {{ extra_args }} --foreman-initial-organization {{ organization | quote }} --foreman-initial-location {{ location | quote }} --foreman-initial-admin-username {{ admin_username | quote }} --foreman-initial-admin-password {{ admin_password | quote }}
   tags:
-    - install-satellite
+    - satellite-install
+    - satellite-install-installer
 
 - name: Install redhat-access-insights-puppet
   when: '"puppet-server=true" in useful_features'
@@ -112,3 +122,6 @@
     name: redhat-access-insights-puppet
     state: installed
     disable_plugin: foreman-protector
+  tags:
+    - satellite-install
+    - satellite-install-insights

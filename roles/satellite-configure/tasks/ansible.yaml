@@ -5,12 +5,20 @@
   file:
     path: "/etc/ansible/roles/{{ item }}"
     state: directory
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-roles
 
 - name: Copy Ansible roles
   with_items: "{{ curr_roles }}"
   ansible.builtin.copy:
     src: "{{role_path}}/files/ansible/roles/{{ item }}"
     dest: "/etc/ansible/roles/{{ item }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-roles
 
 #- name: Sync Ansible roles
 #  
@@ -20,12 +28,20 @@
   file:
     path: "/tmp/{{ item.file | dirname }}"
     state: directory
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-playbooks
 
 - name: Copy Ansible playbooks
   with_items: "{{ curr_plays }}"
   ansible.builtin.copy:
     src: "{{ role_path }}/files/ansible/playbooks/{{ item.file }}"
     dest: "/tmp/{{ item.file }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-playbooks
 
 - name: Create Ansible Jobs
   with_items: "{{ curr_plays }}"
@@ -41,3 +57,7 @@
     - "{{ location }}"
     organizations:
     - "{{ organization }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-playbooks

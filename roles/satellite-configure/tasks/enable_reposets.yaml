@@ -12,7 +12,8 @@
     search: label="{{ item }}"
   register: data
   tags:
-    - reposets
+    - satellite-configure
+    - satellite-configure-reposets
 
 - name: Enable repos
   include_tasks: "{{ role_path }}/tasks/enable_reposets/enable_repos.yaml"
@@ -20,7 +21,8 @@
   loop_control:
     loop_var: result
   tags:
-    - reposets
+    - satellite-configure
+    - satellite-configure-reposets
 
 - name: Get Additional Repository Set info
   with_items: "{{ additional_redhat_repos }}"
@@ -34,7 +36,8 @@
     search: label="{{ item }}"
   register: data
   tags:
-    - reposets
+    - satellite-configure
+    - satellite-configure-reposets
 
 - name: Enable Additional RH repos
   include_tasks: "{{ role_path }}/tasks/enable_reposets/enable_repos.yaml"
@@ -42,4 +45,5 @@
   loop_control:
     loop_var: result
   tags:
-    - reposets
+    - satellite-configure
+    - satellite-configure-reposets

@@ -5,14 +5,16 @@
     path: "{{ manifest_file }}"
   register: manifest_exists
   tags: 
-    - configure-manifest
+    - satellite-configure
+    - satellite-configure-manifest
 
 - name: Fail if manifest file doesn't exist
   when: manifest_file is not defined or manifest_file == "" or manifest_exists.stat.exists == false
   fail:
     msg: Manifest file must be defined and exist
   tags:
-    - configure-manifest
+    - satellite-configure
+    - satellite-configure-manifest
 
 - name: Copy manifest to Satellite server
   become: true
@@ -20,7 +22,8 @@
     src: "{{ manifest_file }}"
     dest: "/root/manifest.zip"
   tags:
-    - configure-manifest
+    - satellite-configure
+    - satellite-configure-manifest
 
 - name: Add Subscription Manifest
   become: true
@@ -33,4 +36,5 @@
     state: present
     manifest_path: "/root/manifest.zip"
   tags:
-    - configure-manifest
+    - satellite-configure
+    - satellite-configure-manifest

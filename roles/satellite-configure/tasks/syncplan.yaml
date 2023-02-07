@@ -10,7 +10,8 @@
     organization: "{{ organization }}"
   register: products
   tags:
-    - syncplan
+    - satellite-configure
+    - satellite-configure-syncplan
 
 - name: Create daily sync plan and assign to all products
   theforeman.foreman.sync_plan:
@@ -26,4 +27,5 @@
     products: "{{ products | json_query('resources[?repository_count > `0`].name') }}"
     state: present
   tags:
-    - syncplan
+    - satellite-configure
+    - satellite-configure-syncplan

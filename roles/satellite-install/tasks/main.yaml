@@ -17,12 +17,21 @@
 
 - name: Check Prerequisites
   include_tasks: "{{ role_path }}/tasks/pre-reqs.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
 
 - name: Enable Repositories
   include_tasks: "{{ role_path }}/tasks/repos.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-repos
 
 - name: Install Dependencies
   include_tasks: "{{ role_path }}/tasks/dependencies.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-dependencies
 
 
 - name: Update all packages
@@ -31,7 +40,8 @@
     name: '*'
     state: latest
   tags:
-    - install-update
+    - satellite-install
+    - satellite-install-updateall
 
 - name: Check if a restart is required
   ansible.builtin.command:
@@ -39,16 +49,26 @@
   register: needsrestart
   ignore_errors: true
   tags:
-    - install-update
+    - satellite-install
+    - satellite-install-updateall
+    - satellite-install-updateall-reboot
 
 - name: Reboot server
   when: needsrestart == 1
   ansible.builtin.reboot:
   tags:
-    - install-update
+    - satellite-install
+    - satellite-install-updateall
+    - satellite-install-updateall-reboot
 
 - name: Install Satellite
   include_tasks: "{{ role_path }}/tasks/install.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-installer
 
 - name: Configure Firewalld
   include_tasks: "{{ role_path }}/tasks/firewall.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-firewall

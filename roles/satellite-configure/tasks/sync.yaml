@@ -10,7 +10,8 @@
     organization: "{{ organization }}"
   register: repositories
   tags:
-    - sync
+    - satellite-configure
+    - satellite-configure-syncrepos
 
 - name: Sync the repositories (very long process)
   theforeman.foreman.repository_sync:
@@ -24,4 +25,5 @@
   with_items: "{{ repositories | json_query('resources[?content_type == `yum`].{ name: name, product: product.name }') }}"
   ignore_errors: true
   tags:
-    - sync
+    - satellite-configure
+    - satellite-configure-syncrepos

@@ -12,18 +12,21 @@
     state: present
     parent: "{{ parent | default(omit) }}"
   tags:
-    - hostgroups
+    - satellite-configure
+    - satellite-configure-hostgroups
 
 - name: Append parent
   when: parent != ""
   set_fact:
     parent: "{{ parent }}/{{ part }}"
   tags:
-    - hostgroups
+    - satellite-configure
+    - satellite-configure-hostgroups
 
 - name: Set parent
   when: parent == ""
   set_fact:
     parent: "{{ part }}"
   tags:
-    - hostgroups
+    - satellite-configure
+    - satellite-configure-hostgroups
