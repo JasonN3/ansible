@@ -1,7 +1,7 @@
 supported_os:
   - "8"
 
-satellite_version: "6.12"
+satellite_version: "6.11"
 
 repos7:
   - rhel-{{ ansible_distribution_major_version }}-server-rpms
