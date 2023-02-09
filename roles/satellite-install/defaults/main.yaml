@@ -52,3 +52,5 @@ packages: []
 
 # Packages to install on RHEL8 machines
 packages8: []
+
+bugfixes: []

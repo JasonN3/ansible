@@ -72,3 +72,12 @@
   tags:
     - satellite-install
     - satellite-install-firewall
+
+- name: Run bugfixes
+  include_tasks: "{{ role_path }}/tasks/bugfixes.yaml"
+  loop: "{{ bugfixes}}"
+  loop_control:
+    loop_var: bug
+  tags:
+    - satellite-install
+    - satellite-install-bugfixes

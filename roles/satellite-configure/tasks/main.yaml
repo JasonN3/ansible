@@ -26,6 +26,12 @@
     - satellite-configure
     - satellite-configure-reposets
 
+- name: Set Kickstart to immediate
+  include_tasks: "{{ role_path }}/tasks/kickstart.yaml"
+  tags:
+    - satellite-configure
+    - satellite-configure-reposets
+
 - name: Create Daily Syncplan
   include_tasks: "{{ role_path }}/tasks/syncplan.yaml"
   tags:

@@ -41,19 +41,3 @@
   tags:
     - satellite-configure
     - satellite-configure-reposets
-
-#TODO: Set Kickstart repos to immediate download policy
-#- name: Set kickstart repos to immediate
-#  when: '"Kickstart" in item.name'
-#  with_items: "{{ repo }}"
-#  theforeman.foreman.repository:
-#    username: "{{ admin_username }}"
-#    password: "{{ admin_password }}"
-#    server_url: "https://localhost"
-#    validate_certs: false
-#    organization: "{{ organization }}"
-#    name: "{{ item.name }}"
-#    state: present
-#    content_type: yum
-#    product: "{{ result.resources[0]['product']['name'] }}"
-#    download_policy: immediate
