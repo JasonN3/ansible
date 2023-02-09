@@ -11,7 +11,7 @@
 
 - name: Check for Satellite server DNS record
   set_fact:
-    sat_dns: "{{ lookup('community.general.dig', 'example.com.')}}"
+    sat_dns: "{{ lookup('community.general.dig', '{{ inventory_hostname }}.')}}"
   tags:
     - satellite-install
     - satellite-install-prereqs
