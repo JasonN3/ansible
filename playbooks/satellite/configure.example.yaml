@@ -107,7 +107,7 @@ deployment: demo
 
 # Additional features to enable
 ## Options are available by running "satellite-installer --help" or "satellite-installer --full-help"
-## Don't include the '--' before the command argument
+## Don't include the '--' before the command argument when listing additional features
 additional_features: []
 
 # SELinux state. Either 'enforcing' or 'permissive'
