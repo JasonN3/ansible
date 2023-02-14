@@ -3,22 +3,22 @@
   hosts:
     - satellite
   roles:
-    - satellite-install
+    - satellite_install
   pre_tasks:
-  - name: Import configure variables
-    include_vars:
-      file: "{{ CONFIG }}"
-    tags:
-      - always
+    - name: Import configure variables
+      include_vars:
+        file: "{{ CONFIG }}"
+      tags:
+        - always
 
 - name: Configure Satellite
   hosts:
     - satellite
   roles:
-    - satellite-configure
+    - satellite_configure
   pre_tasks:
-  - name: Import configure variables
-    include_vars:
-      file: "{{ CONFIG }}"
-    tags:
-      - always
+    - name: Import configure variables
+      include_vars:
+        file: "{{ CONFIG }}"
+      tags:
+        - always

@@ -1,0 +1,65 @@
+---
+
+- name: Create all Ansible role directories
+  with_items: "{{ curr_roles }}"
+  ansible.builtin.file:
+    path: "/etc/ansible/roles/{{ item }}"
+    state: directory
+    mode: '0555'
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-roles
+
+- name: Copy Ansible roles
+  with_items: "{{ curr_roles }}"
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/ansible/roles/{{ item }}"
+    dest: "/etc/ansible/roles/{{ item }}"
+    mode: '0444'
+    directory_mode: '0555'
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-roles
+
+- name: Create all Ansible playbook directories
+  with_items: "{{ curr_plays }}"
+  ansible.builtin.file:
+    path: "/tmp/{{ item.file | dirname }}"
+    state: directory
+    mode: '0500'
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-playbooks
+
+- name: Copy Ansible playbooks
+  with_items: "{{ curr_plays }}"
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/ansible/playbooks/{{ item.file }}"
+    dest: "/tmp/{{ item.file }}"
+    mode: '0400'
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-playbooks
+
+- name: Create Ansible Jobs
+  with_items: "{{ curr_plays }}"
+  theforeman.foreman.job_template:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    name: "{{ item.name }}"
+    file_name: "/tmp/{{ item.file }}"
+    state: present
+    locations:
+      - "{{ location }}"
+    organizations:
+      - "{{ organization }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-ansible
+    - satellite-configure-ansible-playbooks

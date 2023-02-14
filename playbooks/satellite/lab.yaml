@@ -1,7 +1,7 @@
 - name: Configure Satellite
   hosts:
     - satellite
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Import configure variables
       include_vars:
@@ -32,7 +32,7 @@
       set_fact:
         accounts: "{{ accounts + [ ('%02d' | format(item | int)) ] }}"
         organizations: "{{ organizations + [ ('Demo_%02d' | format(item | int)) ] }}"
-    
+
     - name: "Create Organization"
       with_items: "{{ organizations }}"
       theforeman.foreman.organization:
@@ -55,7 +55,7 @@
         lastname: "User {{ item }}"
         mail: "root@localhost"
         description: "Workshop User {{ item }}"
-        admin: no
+        admin: false
         user_password: "rh2023!@"
         default_location: "{{ location }}"
         default_organization: "Demo_{{ item }}"

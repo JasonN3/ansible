@@ -1,0 +1,34 @@
+---
+
+- name: Configure subnets
+  with_items: "{{ subnets }}"
+  theforeman.foreman.subnet:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    network: "{{ item.network }}"
+    cidr: "{{ item.cidr }}"
+    gateway: "{{ item.gateway }}"
+    from_ip: "{{ item.dhcp_start }}"
+    to_ip: "{{ item.dhcp_end }}"
+    boot_mode: "{{ item.dhcp_mode }}"
+    dhcp_proxy: "{{ item.dhcp_server }}"
+    tftp_proxy: "{{ item.tftp_server | default(item.dhcp_server) }}"
+    dns_proxy: "{{ item.dns_server | default(omit) }}"
+    dns_primary: "{{ item.dns_servers[0] | default(omit) }}"
+    dns_secondary: "{{ item.dns_servers[1] | default(omit) }}"
+    template_proxy: "{{ item.template_server | default(item.dhcp_server) }}"
+    vlanid: "{{ item.vlan_id | default(omit) }}"
+    mtu: "{{ item.mtu | default(1500) }}"
+    domains: "{{ item.domains }}"
+    organizations:
+      - "{{ organization }}"
+    locations:
+      - "{{ location }}"
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    state: present
+  tags:
+    - satellite-configure
+    - satellite-configure-subnets

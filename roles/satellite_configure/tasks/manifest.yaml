@@ -1,0 +1,41 @@
+- name: Check for manifest file
+  when: manifest_file is defined and manifest_file != ""
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ manifest_file }}"
+  register: manifest_exists
+  tags:
+    - satellite-configure
+    - satellite-configure-manifest
+
+- name: Fail if manifest file doesn't exist
+  when: manifest_file is not defined or manifest_file == "" or not manifest_exists.stat.exists
+  ansible.builtin.fail:
+    msg: Manifest file must be defined and exist
+  tags:
+    - satellite-configure
+    - satellite-configure-manifest
+
+- name: Copy manifest to Satellite server
+  become: true
+  ansible.builtin.copy:
+    src: "{{ manifest_file }}"
+    dest: "/root/manifest.zip"
+    mode: '0400'
+  tags:
+    - satellite-configure
+    - satellite-configure-manifest
+
+- name: Add Subscription Manifest
+  become: true
+  theforeman.foreman.subscription_manifest:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    state: present
+    manifest_path: "/root/manifest.zip"
+  tags:
+    - satellite-configure
+    - satellite-configure-manifest

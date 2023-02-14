@@ -5,7 +5,12 @@
       ansible.builtin.wait_for_connection:
 
     - name: Create VMware Snapshot
-      when: vcenter_hostname is defined and vcenter_username is defined and vcenter_password is defined and snapshot_during_patching is defined and snapshot_during_patching == 'yes'
+      when: >
+        vcenter_hostname is defined and
+        vcenter_username is defined and
+        vcenter_password is defined and
+        snapshot_during_patching is defined and
+        snapshot_during_patching == 'yes'
       community.vmware.vmware_guest_snapshot:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -38,7 +43,7 @@
       when: reboot == 'auto'
       command: needs-restarting -r
       register: result
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Reboot Server
       ansible.builtin.reboot:
@@ -52,7 +57,12 @@
         loop_var: role
 
     - name: Delete VMware Snapshot
-      when: vcenter_hostname is defined and vcenter_username is defined and vcenter_password is defined and snapshot_during_patching is defined and snapshot_during_patching == 'yes'
+      when: >
+        vcenter_hostname is defined and
+        vcenter_username is defined and
+        vcenter_password is defined and
+        snapshot_during_patching is defined and
+        snapshot_during_patching == 'yes'
       community.vmware.vmware_guest_snapshot:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"

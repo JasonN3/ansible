@@ -1,0 +1,24 @@
+---
+
+- name: Set groupname
+  ansible.builtin.set_fact:
+    groupname: "{{ hostgroup_department }}/{{ department }}-{{ lifecycle }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Reset parent var
+  ansible.builtin.set_fact:
+    parent: ""
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Split parent groups
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups/create.yml"
+  loop: "{{ groupname | split('/') }}"
+  loop_control:
+    loop_var: part
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups

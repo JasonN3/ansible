@@ -1,0 +1,57 @@
+# Additional repos (none-RH)
+additional_repos: []
+#  - base_url: *url*
+
+# Compute Resource to enable during installation
+compute_resources: []
+#  - type: VMware
+
+
+# Fill out to install custom certificate during installation
+# certificate:
+#   cert_file: cert_file.pem
+#   key_file: key_file.pem
+#   ca_bundle: ca_bundle.pem
+
+# The default Organization that will be created during installation
+organization: "Default Organization"
+# The default Location that will be created during installation
+location: "Default Location"
+
+# Additional features to enable
+## Options are available by running "satellite-installer --help"
+## Don't include the '--' before the command argument
+additional_features: []
+
+# The admin username and password that will be created during installation
+## An empty password will randomly generate a password
+admin_username: "admin"
+admin_password: ""
+
+# Fill out to connect the Satellite instance to Ansible Automation Platform (AAP)
+## The credentials will be used to create the following:
+## 1.
+## TODO
+# aap_credentials:
+#   username: *user*
+#   password: *password*
+
+# Activation username and password or activation key and org id
+## This is required for enabling subscriptions even if the machine is already attached
+# activation:
+  # username: ""
+  # password: ""
+
+  # org_id: ""
+  # activation_key: ""
+
+# SELinux state. Either 'enforcing' or 'permissive'
+selinux: permissive
+
+# Packages to install on all machines
+packages: []
+
+# Packages to install on RHEL8 machines
+packages8: []
+
+bugfixes: []

@@ -1,0 +1,11 @@
+galaxy_info:
+  role_name: satellite_install
+  author: JasonN3
+  description: Installs a Satellite server
+
+  license: BSD
+  min_ansible_version: "2.13"
+
+collections:
+  - community.general
+  - ansible.posix

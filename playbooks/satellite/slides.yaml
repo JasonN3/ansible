@@ -2,29 +2,33 @@
   hosts:
     - satellite
   roles:
-    - configure-satellite
-  gather_facts: no
+    - configure_satellite
+  gather_facts: false
   pre_tasks:
     - name: Import configure variables
-      include_vars:
+      ansible.builtin.include_vars:
         file: configure.yaml
+
     - name: Check if persistent variables file exists
       delegate_to: localhost
-      stat:
+      ansible.builtin.stat:
         path: "{{ playbook_dir }}/persistent.yaml"
       register: persistent_exists
+
     - name: Import persistent variables
       when: persistent_exists.stat.exists
-      include_vars:
+      ansible.builtin.include_vars:
         file: "{{ playbook_dir }}/persistent.yaml"
+
     - name: Import lab-configure variables
-      include_vars:
+      ansible.builtin.include_vars:
         file: lab-configure.yaml
+
     - name: "Init accounts var"
-      set_fact:
+      ansible.builtin.set_fact:
         accounts: []
+
     - name: "Generate account list"
       with_sequence: start=1 end={{ lab_accounts }}
-      set_fact:
+      ansible.builtin.set_fact:
         accounts: "{{ accounts + [ ('%02d' | format(item | int)) ] }}"
-    
