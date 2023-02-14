@@ -2,12 +2,11 @@
 
 - name: Get available repositories
   ansible.builtin.uri:
-    url: >
-      https://localhost/katello/api/products/
-      {{ result.resources[0]['product']['id'] }}
-      /repository_sets/
-      {{ result.resources[0]['id'] }}
-      /available_repositories
+    url: "https://localhost/katello/api/products/\
+      {{ result.resources[0]['product']['id'] }}\
+      /repository_sets/\
+      {{ result.resources[0]['id'] }}\
+      /available_repositories"
     url_username: "{{ admin_username }}"
     url_password: "{{ admin_password }}"
     validate_certs: false
@@ -23,7 +22,7 @@
       available.json.results[0].substitutions.releasever is defined and
       '.' not in available.json.results[0].substitutions.releasever
     ) or
-    available.json.results[0].substitutions.releasever is not defined"
+    available.json.results[0].substitutions.releasever is not defined
   ansible.builtin.set_fact:
     repo: "[ {{ available.json.results[0] }} ]"
   tags:
