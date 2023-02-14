@@ -33,7 +33,7 @@
 - name: Forward and Reverse DNS records must exist or host must be defined in /etc/hosts
   when: (sat_dns == '' or sat_dns == 'NXDOMAIN') and (sat_host.found == 0)
   ansible.builtin.fail:
-    message: Host not found in dns or /etc/hosts
+    msg: Host not found in dns or /etc/hosts
   tags:
     - satellite-install
     - satellite-install-prereqs
