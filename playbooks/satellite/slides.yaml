@@ -2,7 +2,7 @@
   hosts:
     - satellite
   roles:
-    - configure_satellite
+    - satellite_configure
   gather_facts: false
   pre_tasks:
     - name: Import configure variables
