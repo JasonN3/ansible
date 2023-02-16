@@ -1,0 +1,20 @@
+---
+
+- name: Configure Compute Resources # noqa: args[module]
+  theforeman.foreman.compute_resource:
+    state: present
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    name: "{{ item.name }}"
+    locations:
+      - "{{ location }}"
+    organizations:
+      - "{{ organization }}"
+    provider: "{{ item.type }}"
+    provider_params: "{{ item.provider_params }}"
+  loop: "{{ compute_resources }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-computeresources

@@ -1,0 +1,121 @@
+##################################################################################################
+############################################ REQUIRED ############################################
+##################################################################################################
+
+# The default Organization that will be created during installation
+organization: "Default Organization"
+# The default Location that will be created during installation
+location: "Default Location"
+
+# The admin username and password that will be created during installation
+## An empty password will randomly generate a password and store it in persistent.yaml
+admin_username: "admin"
+admin_password: ""
+
+# Activation username and password or activation key and org id
+## This is required for enabling subscriptions even if the machine is already attached
+# activation:
+  # username: ""
+  # password: ""
+
+  # org_id: ""
+  # activation_key: ""
+
+# The manifest file to import
+manifest_file: ""
+
+# Lifecycles to create
+lifecycles:
+  - prior: Library
+    name: Dev
+  - prior: Dev
+    name: Prod
+
+# Host groups to create
+host_groups:
+  General:
+    Domain: {}
+    Non-Domain: {}
+
+# Departments to nest within the host groups
+departments:
+  - Department1
+  - Department2
+
+subnets: []
+# - name: NAME
+#   description: DESCRIPTION
+#   network: 10.0.0.0
+#   cidr: 24
+#   gateway: 10.0.0.1
+#   dhcp_start: 10.0.0.11
+#   dhcp_end: 10.0.0.254
+#   dhcp_mode: DHCP
+#   dhcp_server: satellite
+#   tftp_server: satellite
+#   dns_server: satellite
+#   dns_servers: []
+#   template_server: satellite
+#   vlan_id: 0
+#   mtu: 1500
+#   domains:
+#   - "domain1"
+#   - "domain2"
+
+##################################################################################################
+########################################## RECOMMENDED ###########################################
+##################################################################################################
+
+# Fill out to install custom certificate during installation
+# certificate:
+#   cert_file: cert_file.pem
+#   key_file: key_file.pem
+#   ca_bundle: ca_bundle.pem
+
+# Additional repos (none-RH)
+additional_repos:
+  - product: "EPEL"
+    repo_name: "Everything 8"
+    base_url: "https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/"
+    gpg_key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL"
+  - product: "EPEL"
+    repo_name: "Modular 8"
+    base_url: "https://dl.fedoraproject.org/pub/epel/8/Modular/x86_64/"
+    gpg_key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL"
+
+# Compute Resource to configure
+compute_resources: []
+#  - type: VMware
+#    name: VMwareInstance
+#    provider_params:
+#      caching_enabled: false
+#      url: vsphere.example.com
+#      user: admin
+#      password: secret
+#      datacenter: ax01
+
+# Deployment type
+# demo: configure for a demo environment
+# prod: configure for a non-demo environment
+deployment: demo
+
+##################################################################################################
+############################################ OPTIONAL ############################################
+##################################################################################################
+
+# Additional features to enable
+## Options are available by running "satellite-installer --help" or "satellite-installer --full-help"
+## Don't include the '--' before the command argument when listing additional features
+additional_features: []
+
+# SELinux state. Either 'enforcing' or 'permissive'
+selinux: permissive
+
+# Packages to install on all machines
+packages: []
+
+# Packages to install on RHEL8 machines
+packages8: []
+
+# Additional Red Hat Repos to add
+additional_redhat_repos: []

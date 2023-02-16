@@ -1,0 +1,142 @@
+---
+
+- name: Stage variables
+  ansible.builtin.set_fact:
+    extra_args: ""
+  tags:
+    - always
+
+- name: Enable Compute Resources
+  when: '("--enable-foreman-compute-" + item.type) not in extra_args'
+  ansible.builtin.set_fact:
+    extra_args: "{{ extra_args }} --enable-foreman-compute-{{ item.type }}"
+  with_items: "{{ compute_resources }}"
+  tags:
+    - satellite-install
+    - satellite-install-computeresources
+
+- name: Check certificate requirements
+  when: certificate is defined and certificate != {}
+  tags:
+    - satellite-install
+    - satellite-install-certificate
+  block:
+    - name: Check cert_file
+      when: certificate.cert_file is not defined or certificate.cert_file == ""
+      ansible.builtin.fail:
+        msg: "certificate.cert_file must be defined"
+
+    - name: Check key_file
+      when: certificate.key_file is not defined or certificate.key_file == ""
+      ansible.builtin.fail:
+        msg: certificate.key_file must be defined
+
+    - name: Check ca_bundle
+      when: certificate.ca_bundle is not defined or certificate.ca_bundle == ""
+      ansible.builtin.fail:
+        msg: certificate.ca_bundle must be defined
+
+    - name: Create certificate location on server
+      become: true
+      ansible.builtin.file:
+        path: /root/satellite_certificate
+        state: directory
+        mode: '0700'
+
+    - name: Copy cert_file to server
+      become: true
+      ansible.builtin.copy:
+        src: "{{ certificate.cert_file }}"
+        dest: "/root/satellite_certificate/cert_file.pem"
+        mode: '0400'
+
+    - name: Copy key_file to server
+      become: true
+      ansible.builtin.copy:
+        src: "{{ certificate.key_file }}"
+        dest: "/root/satellite_certificate/key_file.pem"
+        mode: '0400'
+
+    - name: Copy ca_bundle to server
+      become: true
+      ansible.builtin.copy:
+        src: "{{ certificate.ca_bundle }}"
+        dest: "/root/satellite_certificate/ca_bundle.pem"
+        mode: '0400'
+
+    - name: Enable Custom Certificate
+      ansible.builtin.set_fact:
+        extra_args: >
+          {{ extra_args }}
+          --certs-server-cert /root/satellite_certificate/cert_file.pem
+          --certs-server-key /root/satellite_certificate/key_file.pem
+          --certs-server-ca-cert /root/satellite_certificate/ca_bundle.pem
+
+- name: Set useful features
+  ansible.builtin.set_fact:
+    extra_args: "{{ extra_args }} --{{ item }}"
+  with_items: "{{ useful_features }}"
+  tags:
+    - satellite-install
+    - satellite-install-usefulfeatures
+
+- name: Set additional features
+  ansible.builtin.set_fact:
+    extra_args: "{{ extra_args }} --{{ item }}"
+  with_items: "{{ additional_features }}"
+  tags:
+    - satellite-install
+    - satellite-install-additionalfeatures
+
+# TODO: If DHCP and DNS, set DHCP option for DNS
+# --foreman-proxy-dhcp-nameservers {{ self-ip }}
+
+- name: Generate and save admin password
+  when: admin_password is not defined or admin_password == ""
+  tags:
+    - satellite-install
+    - satellite-install-genpassword
+  block:
+    - name: Generate random password
+      ansible.builtin.set_fact:
+        gen_password: "{{ lookup('ansible.builtin.password', '/dev/null length=20') }}"
+    - name: Create persistent.yaml
+      delegate_to: localhost
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/persistent.yaml"
+        state: touch
+        mode: '0600'
+    - name: Save password
+      delegate_to: localhost
+      ansible.builtin.lineinfile:
+        path: "{{ playbook_dir }}/persistent.yaml"
+        line: "admin_password: {{ gen_password }}"
+    - name: Store password
+      ansible.builtin.set_fact:
+        admin_password: "{{ gen_password }}"
+
+- name: Install Satellite (Output is visible at /var/log/foreman-installer/satellite.log on the Satellite server) # noqa: no-changed-when
+  become: true
+  ansible.builtin.command:
+    cmd: >
+      satellite-installer
+        --scenario satellite
+        {{ extra_args }}
+        --foreman-initial-organization {{ organization | quote }}
+        --foreman-initial-location {{ location | quote }}
+        --foreman-initial-admin-username {{ admin_username | quote }}
+        --foreman-initial-admin-password {{ admin_password | quote }}
+  tags:
+    - satellite-install
+    - satellite-install-installer
+
+- name: Install redhat-access-insights-puppet
+  when: '"puppet-server=true" in useful_features'
+  become: true
+  ansible.builtin.dnf:
+    name: redhat-access-insights-puppet
+    state: installed
+    disable_plugin: foreman-protector
+  tags:
+    - satellite-install
+    - satellite-install-insights

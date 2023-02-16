@@ -1,0 +1,25 @@
+---
+
+- name: Query for site health
+  ansible.builtin.uri:
+    url: "http://localhost/"
+    status_code: "200"
+  register: site_health
+
+- name: Fix problems
+  until: site_health is succeeded or fix_attempt >= 5
+  block:
+    - name: Count fix attempts
+      ansible.builtin.set_fact:
+        fix_attempt: "{{ fix_attempt | int + 1 }}"
+
+    - name: Ensure the service is running
+      ansible.builtin.service:
+        name: httpd
+        state: started
+
+    - name: Query for site health
+      ansible.builtin.uri:
+        url: "http://localhost/"
+        status_code: "200"
+      register: site_health

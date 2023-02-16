@@ -1,0 +1,32 @@
+name: ansible-lint
+
+on:
+  pull_request:
+    branches:
+    - main
+    types:
+    - ready_for_review
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  puppet-lint:
+    if: github.event.pull_request.draft == false
+    name: Run ansible lint
+    runs-on: ubuntu-latest
+    container:
+      image: pipelinecomponents/ansible-lint:latest
+    permissions:
+      contents: read # for checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Validate code
+        run: |
+          ansible-lint

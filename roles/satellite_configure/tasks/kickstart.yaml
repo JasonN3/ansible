@@ -1,0 +1,27 @@
+---
+
+- name: Get all enabled repos
+  theforeman.foreman.resource_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    resource: repositories
+  register: repos
+  tags:
+    - always
+
+- name: Set kickstart repos to immediate sync
+  with_items: "{{ repos.resources | json_query('[?ends_with(content_label, `kickstart`)].{ name: name, id: id }') }}"
+  ansible.builtin.uri:
+    url: "https://localhost/katello/api/repositories/{{ item.id }}"
+    url_username: "{{ admin_username }}"
+    url_password: "{{ admin_password }}"
+    validate_certs: false
+    force_basic_auth: true
+    method: "PUT"
+    body_format: json
+    body: "{ 'id': {{ item.id }}, 'download_policy': 'immediate' }"
+  tags:
+    - always

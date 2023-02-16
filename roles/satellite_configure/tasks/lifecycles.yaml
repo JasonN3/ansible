@@ -1,0 +1,17 @@
+---
+
+- name: Create lifecycles
+  theforeman.foreman.lifecycle_environment:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "{{ item.name }}"
+    label: "{{ item.name | lower }}"
+    prior: "{{ item.prior }}"
+    state: "present"
+  with_items: "{{ lifecycles }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-lifecycles

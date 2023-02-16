@@ -1,0 +1,17 @@
+---
+
+- name: Extract department
+  ansible.builtin.set_fact:
+    department: "{{ (hostgroup_department | split('/'))[-1] }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Create hostgroups including parents
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups/split.yml"
+  loop: "{{ lifecycles | json_query('[].name') }}"
+  loop_control:
+    loop_var: lifecycle
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
