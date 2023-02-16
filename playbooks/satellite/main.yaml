@@ -6,7 +6,7 @@
     - satellite_install
   pre_tasks:
     - name: Import configure variables
-      include_vars:
+      ansible.builtin.include_vars:
         file: "{{ CONFIG }}"
       tags:
         - always
@@ -18,7 +18,7 @@
     - satellite_configure
   pre_tasks:
     - name: Import configure variables
-      include_vars:
+      ansible.builtin.include_vars:
         file: "{{ CONFIG }}"
       tags:
         - always

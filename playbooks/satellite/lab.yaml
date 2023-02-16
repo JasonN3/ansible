@@ -4,34 +4,34 @@
   gather_facts: false
   tasks:
     - name: Import configure variables
-      include_vars:
+      ansible.builtin.include_vars:
         file: configure.yaml
 
     - name: Check if persistent variables file exists
       delegate_to: localhost
-      stat:
+      ansible.builtin.stat:
         path: "{{ playbook_dir }}/persistent.yaml"
       register: persistent_exists
 
     - name: Import persistent variables
       when: persistent_exists.stat.exists
-      include_vars:
+      ansible.builtin.include_vars:
         file: "{{ playbook_dir }}/persistent.yaml"
 
     - name: Import lab-configure variables
-      include_vars:
+      ansible.builtin.include_vars:
         file: lab-configure.yaml
 
     - name: "Init accounts var"
-      set_fact:
+      ansible.builtin.set_fact:
         accounts: []
         organizations: []
 
     - name: "Generate account list"
       with_sequence: start=1 end={{ lab_accounts }}
-      set_fact:
-        accounts: "{{ accounts + [ ('%02d' | format(item | int)) ] }}"
-        organizations: "{{ organizations + [ ('Demo_%02d' | format(item | int)) ] }}"
+      ansible.builtin.set_fact:
+        accounts: "{{ accounts + [('%02d' | format(item | int))] }}"
+        organizations: "{{ organizations + [('Demo_%02d' | format(item | int))] }}"
 
     - name: "Create Organization"
       with_items: "{{ organizations }}"
@@ -75,7 +75,7 @@
         name: "{{ subnet.name }}"
         network: "{{ subnet.network }}"
         cidr: "{{ subnet.cidr }}"
-        organizations: "{{ [ default_organization ] + organizations }}"
+        organizations: "{{ [default_organization] + organizations }}"
         username: "{{ admin_username }}"
         password: "{{ admin_password }}"
         server_url: "https://localhost"
@@ -90,15 +90,16 @@
         server_url: "https://localhost"
         validate_certs: false
         name: "{{ compute_resource.name }}"
-        organizations: "{{ [ default_organization ] + organizations }}"
+        organizations: "{{ [default_organization] + organizations }}"
         provider: "{{ compute_resource.type }}"
 
     - name: Copy manifest to Satellite server
       become: true
       with_items: "{{ organizations }}"
-      copy:
+      ansible.builtin.copy:
         src: "manifest-{{ item }}.zip"
         dest: "/root/manifest-{{ item }}.zip"
+        mode: '0400'
 
     - name: Add Subscription Manifest
       become: true

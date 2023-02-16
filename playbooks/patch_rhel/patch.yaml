@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Patch RHEL systems
+  hosts: all
   tasks:
     - name: Ensure the machine is online
       ansible.builtin.wait_for_connection:
@@ -32,16 +33,16 @@
     - name: Install needs-restarting
       ansible.builtin.package:
         name: yum-utils
-        state: latest
+        state: present
 
-    - name: Update all packages
+    - name: Update all packages # noqa: package-latest
       ansible.builtin.package:
         name: '*'
         state: latest
 
-    - name: check to see if we need a reboot
+    - name: Check to see if we need a reboot
       when: reboot == 'auto'
-      command: needs-restarting -r
+      ansible.builtin.command: needs-restarting -r
       register: result
       ignore_errors: true
 
@@ -50,7 +51,7 @@
       when: reboot == 'always' or result.rc == 1
 
     - name: Apply all assigned roles
-      include_role:
+      ansible.builtin.include_role:
         name: "{{ role }}"
       loop: "{{ foreman_ansible_roles }}"
       loop_control:

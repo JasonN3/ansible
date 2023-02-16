@@ -31,4 +31,4 @@
     - name: "Generate account list"
       with_sequence: start=1 end={{ lab_accounts }}
       ansible.builtin.set_fact:
-        accounts: "{{ accounts + [ ('%02d' | format(item | int)) ] }}"
+        accounts: "{{ accounts + [('%02d' | format(item | int))] }}"
