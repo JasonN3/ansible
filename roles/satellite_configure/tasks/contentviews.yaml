@@ -1,0 +1,44 @@
+---
+
+- name: Get all repositories
+  theforeman.foreman.repository_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    product: "{{ item }}"
+  with_items: "{{ products | json_query('resources[?repository_count > `0`].name') }}"
+  register: all_repos
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews
+
+- name: Create Everything Content View # noqa: args[module]
+  theforeman.foreman.content_view:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "Everything"
+    repositories: "{{ (all_repos | json_query('results[*].repositories[*].{ name: name, product: product.name }'))[0] }}"
+  register: cv_changed
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews
+
+- name: Publish new version of Everything Content View # noqa: no-handler
+  when: cv_changed.changed
+  theforeman.foreman.content_view_version:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    content_view: "Everything"
+    lifecycle_environments:
+      - Library
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews

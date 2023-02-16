@@ -1,0 +1,83 @@
+---
+
+- name: Check if persistent variables file exists
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/persistent.yaml"
+  register: persistent_exists
+  tags:
+    - always
+
+- name: Import persistent variables
+  when: persistent_exists.stat.exists
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/persistent.yaml"
+  tags:
+    - always
+
+- name: Check Prerequisites
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/pre-reqs.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+
+- name: Enable Repositories
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/repos.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-repos
+
+- name: Install Dependencies
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/dependencies.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-dependencies
+
+
+- name: Update all packages # noqa: package-latest
+  become: true
+  ansible.builtin.package:
+    name: '*'
+    state: latest
+  tags:
+    - satellite-install
+    - satellite-install-updateall
+
+- name: Check if a restart is required # noqa: no-changed-when
+  ansible.builtin.command:
+    cmd: needs-restarting -r
+  register: needsrestart
+  ignore_errors: true
+  tags:
+    - satellite-install
+    - satellite-install-updateall
+    - satellite-install-updateall-reboot
+
+- name: Reboot server
+  when: needsrestart == 1
+  ansible.builtin.reboot:
+  tags:
+    - satellite-install
+    - satellite-install-updateall
+    - satellite-install-updateall-reboot
+
+- name: Install Satellite
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-installer
+
+- name: Configure Firewalld
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/firewall.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-firewall
+
+- name: Run bugfixes
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/bugfixes.yaml"
+  loop: "{{ bugfixes }}"
+  loop_control:
+    loop_var: bug
+  tags:
+    - satellite-install
+    - satellite-install-bugfixes

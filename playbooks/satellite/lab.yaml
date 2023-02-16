@@ -1,0 +1,114 @@
+- name: Configure Satellite
+  hosts:
+    - satellite
+  gather_facts: false
+  tasks:
+    - name: Import configure variables
+      ansible.builtin.include_vars:
+        file: configure.yaml
+
+    - name: Check if persistent variables file exists
+      delegate_to: localhost
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/persistent.yaml"
+      register: persistent_exists
+
+    - name: Import persistent variables
+      when: persistent_exists.stat.exists
+      ansible.builtin.include_vars:
+        file: "{{ playbook_dir }}/persistent.yaml"
+
+    - name: Import lab-configure variables
+      ansible.builtin.include_vars:
+        file: lab-configure.yaml
+
+    - name: "Init accounts var"
+      ansible.builtin.set_fact:
+        accounts: []
+        organizations: []
+
+    - name: "Generate account list"
+      with_sequence: start=1 end={{ lab_accounts }}
+      ansible.builtin.set_fact:
+        accounts: "{{ accounts + [('%02d' | format(item | int))] }}"
+        organizations: "{{ organizations + [('Demo_%02d' | format(item | int))] }}"
+
+    - name: "Create Organization"
+      with_items: "{{ organizations }}"
+      theforeman.foreman.organization:
+        username: "{{ admin_username }}"
+        password: "{{ admin_password }}"
+        server_url: "https://localhost"
+        validate_certs: false
+        name: "{{ item }}"
+        state: present
+
+    - name: "Create User"
+      with_items: "{{ accounts }}"
+      theforeman.foreman.user:
+        username: "{{ admin_username }}"
+        password: "{{ admin_password }}"
+        server_url: "https://localhost"
+        validate_certs: false
+        name: "workshop_{{ item }}"
+        firstname: "Workshop"
+        lastname: "User {{ item }}"
+        mail: "root@localhost"
+        description: "Workshop User {{ item }}"
+        admin: false
+        user_password: "rh2023!@"
+        default_location: "{{ location }}"
+        default_organization: "Demo_{{ item }}"
+        auth_source: Internal
+        timezone: "Central Time (US & Canada)"
+        locale: en
+        roles:
+          - Organization admin
+        locations:
+          - "{{ location }}"
+        organizations:
+          - "Demo_{{ item }}"
+        state: present
+
+    - name: Add subnet to organizations
+      theforeman.foreman.subnet:
+        name: "{{ subnet.name }}"
+        network: "{{ subnet.network }}"
+        cidr: "{{ subnet.cidr }}"
+        organizations: "{{ [default_organization] + organizations }}"
+        username: "{{ admin_username }}"
+        password: "{{ admin_password }}"
+        server_url: "https://localhost"
+        validate_certs: false
+        state: present
+
+    - name: Add Compute Resource to organizations
+      theforeman.foreman.compute_resource:
+        state: present
+        username: "{{ admin_username }}"
+        password: "{{ admin_password }}"
+        server_url: "https://localhost"
+        validate_certs: false
+        name: "{{ compute_resource.name }}"
+        organizations: "{{ [default_organization] + organizations }}"
+        provider: "{{ compute_resource.type }}"
+
+    - name: Copy manifest to Satellite server
+      become: true
+      with_items: "{{ organizations }}"
+      ansible.builtin.copy:
+        src: "manifest-{{ item }}.zip"
+        dest: "/root/manifest-{{ item }}.zip"
+        mode: '0400'
+
+    - name: Add Subscription Manifest
+      become: true
+      with_items: "{{ organizations }}"
+      theforeman.foreman.subscription_manifest:
+        username: "{{ admin_username }}"
+        password: "{{ admin_password }}"
+        server_url: "https://localhost"
+        validate_certs: false
+        organization: "{{ item }}"
+        state: present
+        manifest_path: "/root/manifest-{{ item }}.zip"

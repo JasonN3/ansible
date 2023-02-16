@@ -1,0 +1,24 @@
+---
+
+- name: Install Required Packages - Common
+  become: true
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ packages + satellite_packages }}"
+  tags:
+    - satellite-install
+    - satellite-install-dependencies
+    - satellite-install-dependencies-packages
+
+- name: Install Required Packages - RHEL 8
+  become: true
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ packages8 }}"
+  when: ansible_distribution_major_version == "8"
+  tags:
+    - satellite-install
+    - satellite-install-dependencies
+    - satellite-install-dependencies-packages

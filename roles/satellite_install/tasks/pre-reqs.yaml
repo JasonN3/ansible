@@ -1,0 +1,90 @@
+---
+
+- name: Verify OS is supported
+  ansible.builtin.fail:
+    msg: OS version is not supported. Only RHEL {{ supported_os | join(', ') }} are supported
+  when: ansible_distribution_major_version not in supported_os
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-os
+
+- name: Check for Satellite server DNS record
+  ansible.builtin.set_fact:
+    sat_dns: "{{ lookup('community.general.dig', '{{ inventory_hostname }}.') }}"
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-dns
+
+- name: Check Satellite host file
+  when: sat_dns == '' or sat_dns == 'NXDOMAIN'
+  ansible.builtin.lineinfile:
+    state: absent
+    path: /etc/hosts
+    regexp: ".*{{ inventory_hostname }}.*"
+  check_mode: true
+  register: sat_host
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-dns
+
+- name: Forward and Reverse DNS records must exist or host must be defined in /etc/hosts
+  when: (sat_dns == '' or sat_dns == 'NXDOMAIN') and (sat_host.found == 0)
+  ansible.builtin.fail:
+    msg: Host not found in dns or /etc/hosts
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-dns
+
+- name: Check access to external RH URLs # noqa: args[module]
+  ansible.builtin.uri:
+    url: "{{ item.url }}"
+    status_code: "{{ item.status_code | int }}"
+    validate_certs: false
+  with_items: "{{ external_rh_urls }}"
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-accessrh
+
+- name: Check access to additional repos
+  ansible.builtin.uri:
+    url: "{{ item.base_url }}/repodata/repomd.xml"
+    status_code: "200"
+  with_items: "{{ additional_repos }}"
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-accessrepos
+
+- name: SELinux cannot be disabled
+  when: selinux | lower == "disabled"
+  ansible.builtin.fail:
+    msg: "SELinux cannot be set to disabled"
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-selinux
+
+- name: Ensure selinux is not disabled
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: "SELINUX={{ selinux }}"
+  register: selinux_changed
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-selinux
+
+- name: Reboot server # noqa: no-handler
+  when: selinux_changed.changed
+  ansible.builtin.reboot:
+  tags:
+    - satellite-install
+    - satellite-install-prereqs
+    - satellite-install-prereqs-selinux
+    - satellite-install-prereqs-selinux-reboot

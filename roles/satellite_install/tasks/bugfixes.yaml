@@ -1,0 +1,17 @@
+---
+
+- name: Check if bugfix file exists
+  when: bug in bugfixes
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ role_path }}/tasks/bugfixes/{{ bug }}.yaml"
+  register: bug_exists
+  tags:
+    - always
+
+- name: Run bugfix
+  when: bug in bugfixes and bug_exists.stat.exists
+  ansible.builtin.include_tasks:
+    file: "{{ role_path }}/tasks/bugfixes/{{ bug }}.yaml"
+  tags:
+    - always

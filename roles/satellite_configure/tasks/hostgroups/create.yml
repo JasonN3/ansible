@@ -1,0 +1,32 @@
+---
+
+- name: Create Hostgroup
+  theforeman.foreman.hostgroup:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "{{ part }}"
+    architecture: "x86_64"
+    state: present
+    parent: "{{ parent | default(omit) }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Append parent
+  when: parent != ""
+  ansible.builtin.set_fact:
+    parent: "{{ parent }}/{{ part }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Set parent
+  when: parent == ""
+  ansible.builtin.set_fact:
+    parent: "{{ part }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups

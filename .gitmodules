@@ -1,0 +1,3 @@
+[submodule "roles/satellite-configure/files/puppet/modules"]
+	path = roles/satellite-configure/files/puppet/modules
+	url = https://github.com/JasonN3/puppet_modules.git

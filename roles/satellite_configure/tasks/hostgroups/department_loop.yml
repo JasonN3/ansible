@@ -1,0 +1,24 @@
+---
+
+- name: Clean up hostgroup name
+  ansible.builtin.set_fact:
+    hostgroup_clean: "{{ hostgroup | replace('[', '.') | replace(\"'\", '') | replace(']', '') | replace('.', '/') }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Create department list
+  ansible.builtin.set_fact:
+    hostgroup_departments: "{{ [hostgroup_clean] | product(departments) | map('join', '/') }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Append lifecycle list
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups/environment_loop.yml"
+  loop: "{{ hostgroup_departments }}"
+  loop_control:
+    loop_var: hostgroup_department
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups

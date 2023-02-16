@@ -1,0 +1,10 @@
+---
+
+- name: Create host groups
+  loop: "{{ lookup('ansible.utils.to_paths', host_groups) | list }}"
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups/department_loop.yml"
+  loop_control:
+    loop_var: hostgroup
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups

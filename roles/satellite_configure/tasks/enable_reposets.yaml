@@ -1,0 +1,49 @@
+---
+
+- name: Get Repository Set info
+  with_items: "{{ recommended_repos }}"
+  theforeman.foreman.resource_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    resource: repository_sets
+    organization: "{{ organization }}"
+    search: label="{{ item }}"
+  register: data
+  tags:
+    - satellite-configure
+    - satellite-configure-reposets
+
+- name: Enable repos
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/enable_reposets/enable_repos.yaml"
+  loop: "{{ data.results }}"
+  loop_control:
+    loop_var: result
+  tags:
+    - satellite-configure
+    - satellite-configure-reposets
+
+- name: Get Additional Repository Set info
+  with_items: "{{ additional_redhat_repos }}"
+  theforeman.foreman.resource_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    resource: repository_sets
+    organization: "{{ organization }}"
+    search: label="{{ item }}"
+  register: data
+  tags:
+    - satellite-configure
+    - satellite-configure-reposets
+
+- name: Enable Additional RH repos
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/enable_reposets/enable_repos.yaml"
+  loop: "{{ data.results }}"
+  loop_control:
+    loop_var: result
+  tags:
+    - satellite-configure
+    - satellite-configure-reposets

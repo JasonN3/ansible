@@ -1,0 +1,28 @@
+---
+
+- name: Get all enabled repositories
+  theforeman.foreman.resource_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    resource: repositories
+    organization: "{{ organization }}"
+  register: repositories
+  tags:
+    - satellite-configure
+    - satellite-configure-syncrepos
+
+- name: Sync the repositories (very long process)
+  theforeman.foreman.repository_sync:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    product: "{{ item.product }}"
+    repository: "{{ item.name }}"
+    organization: "{{ organization }}"
+  with_items: "{{ repositories | json_query('resources[?content_type == `yum`].{ name: name, product: product.name }') }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-syncrepos
