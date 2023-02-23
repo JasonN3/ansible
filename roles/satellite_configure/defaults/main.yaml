@@ -44,6 +44,10 @@ departments:
   - Department1
   - Department2
 
+# When all of the repositories should sync each day
+# The day does not matter
+sync_time: "2022-01-01 04:00:00 CST"
+
 
 # Compute Resource to configure
 compute_resources: []
