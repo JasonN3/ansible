@@ -3,6 +3,14 @@
     - satellite
   gather_facts: false
   tasks:
+    - name: Import configure role variables
+      ansible.builtin.include_vars:
+        file: roles/satellite_configure/vars/main.yaml
+
+    - name: Import configure role defaults
+      ansible.builtin.include_vars:
+        file: roles/satellite_configure/defaults/main.yaml
+
     - name: Import configure variables
       ansible.builtin.include_vars:
         file: configure.yaml
@@ -42,6 +50,8 @@
         validate_certs: false
         name: "{{ item }}"
         state: present
+      tags:
+        - skip
 
     - name: "Create User"
       with_items: "{{ accounts }}"
@@ -69,6 +79,8 @@
         organizations:
           - "Demo_{{ item }}"
         state: present
+      tags:
+        - skip
 
     - name: Add subnet to organizations
       theforeman.foreman.subnet:
@@ -81,6 +93,8 @@
         server_url: "https://localhost"
         validate_certs: false
         state: present
+      tags:
+        - skip
 
     - name: Add Compute Resource to organizations
       theforeman.foreman.compute_resource:
@@ -100,6 +114,8 @@
         src: "manifest-{{ item }}.zip"
         dest: "/root/manifest-{{ item }}.zip"
         mode: '0400'
+      tags:
+        - skip
 
     - name: Add Subscription Manifest
       become: true
@@ -112,3 +128,56 @@
         organization: "{{ item }}"
         state: present
         manifest_path: "/root/manifest-{{ item }}.zip"
+      tags:
+        - skip
+
+    - name: Add Puppet Environment to all Organizations
+      theforeman.foreman.puppet_environment:
+        name: "production"
+        locations:
+          - "{{ location }}"
+        organizations: "{{ organizations }}"
+        server_url: "https://localhost"
+        validate_certs: false
+        username: "{{ admin_username }}"
+        password: "{{ admin_password }}"
+        state: present
+
+    - name: Add Domain to all Organizations
+      theforeman.foreman.domain:
+        name: "{{ domain }}"
+        description: "{{ domain }}"
+        locations:
+          - "{{ location }}"
+        organizations: "{{ organizations }}"
+        server_url: "https://localhost"
+        validate_certs: false
+        username: "{{ admin_username }}"
+        password: "{{ admin_password }}"
+        state: present
+
+    - name: Fake role path
+      ansible.builtin.set_fact:
+        role_path: "roles/satellite_configure"
+
+    - name: Include Reposet Tasks
+      loop: "{{ organizations }}"
+      loop_control:
+        loop_var: "organization"
+      ansible.builtin.include_tasks:
+        file: roles/satellite_configure/tasks/enable_reposets.yaml
+      tags:
+        - skip
+
+    - name: Enable Custom Repos
+      loop: "{{ organizations }}"
+      loop_control:
+        loop_var: "organization"
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/custom_repos.yaml"
+
+    - name: Sync all repos
+      loop: "{{ organizations }}"
+      loop_control:
+        loop_var: "organization"
+      ansible.builtin.include_tasks:
+        file: roles/satellite_configure/tasks/sync.yaml

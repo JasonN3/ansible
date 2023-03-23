@@ -1,9 +1,3 @@
-/playbooks/satellite/collections
-/playbooks/satellite/manifest*
-/playbooks/satellite/persistent.yaml
-/playbooks/satellite/configure.yaml
-/playbooks/satellite/lab-configure.yaml
-/playbooks/satellite/inventory.ini
 test_*
 
 TODO.txt

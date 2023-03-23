@@ -3,6 +3,7 @@
 - name: Install R10k gem
   community.general.gem:
     name: r10k
+    executable: '/opt/puppetlabs/bin/puppetserver gem'
     user_install: false
   tags:
     - satellite-configure

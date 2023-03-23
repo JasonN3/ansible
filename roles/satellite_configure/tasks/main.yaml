@@ -20,11 +20,17 @@
     - satellite-configure
     - satellite-configure-manifest
 
-- name: Enable Reposets and Add Custom Repos
+- name: Enable Reposets
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/enable_reposets.yaml"
   tags:
     - satellite-configure
     - satellite-configure-reposets
+
+- name: Enable Custom Repos
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/custom_repos.yaml"
+  tags:
+    - satellite-configure
+    - satellite-configure-custom_repos
 
 - name: Set Kickstart to immediate
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/kickstart.yaml"

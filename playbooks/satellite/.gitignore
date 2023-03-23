@@ -1,0 +1,7 @@
+/collections
+/manifest*
+/persistent.yaml
+/configure.yaml
+/lab-configure.yaml
+/inventory.ini
+/certs
