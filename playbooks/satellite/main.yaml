@@ -1,15 +1,15 @@
 ---
-#- name: Install Satellite
-#  hosts:
-#    - satellite
-#  roles:
-#    - satellite_install
-#  pre_tasks:
-#    - name: Import configure variables
-#      ansible.builtin.include_vars:
-#        file: "{{ CONFIG }}"
-#      tags:
-#        - always
+- name: Install Satellite
+  hosts:
+    - satellite
+  roles:
+    - satellite_install
+  pre_tasks:
+    - name: Import configure variables
+      ansible.builtin.include_vars:
+        file: "{{ CONFIG }}"
+      tags:
+        - always
 
 - name: Configure Satellite
   hosts:

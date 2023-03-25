@@ -74,12 +74,12 @@ subnets: []
 
 # Additional repos (none-RH)
 additional_repos:
-  - product: "EPEL"
-    repo_name: "Everything 8"
+  - product: "EPEL8"
+    repo_name: "Everything"
     base_url: "https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/"
     gpg_key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL"
-  - product: "EPEL"
-    repo_name: "Modular 8"
+  - product: "EPEL8"
+    repo_name: "Modular"
     base_url: "https://dl.fedoraproject.org/pub/epel/8/Modular/x86_64/"
     gpg_key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL"
 
