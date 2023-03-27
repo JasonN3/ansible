@@ -1,3 +1,0 @@
-mod 'modules',
-  :git => 'https://github.com/JasonN3/puppet_modules.git',
-  :ref => 'main'

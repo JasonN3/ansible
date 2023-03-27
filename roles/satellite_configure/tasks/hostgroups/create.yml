@@ -1,5 +1,4 @@
 ---
-
 - name: Create Hostgroup
   theforeman.foreman.hostgroup:
     username: "{{ admin_username }}"
@@ -11,11 +10,13 @@
     architecture: "x86_64"
     state: present
     parent: "{{ parent | default(omit) }}"
+    lifecycle_environment: "{{ lifecycle if ( ( ( part | split('-') )[-1] ) == lifecycle ) else 'Library' if part == 'General' else omit }}"
+    environment: "{{ lifecycles | json_query('[?name == `' ~ lifecycle ~ '`].puppet') | first if ( ( ( part | split('-') )[-1] ) == lifecycle ) else default_environment if part == 'General' else omit }}"
   tags:
     - satellite-configure
     - satellite-configure-hostgroups
 
-- name: Append parent
+- name: Append parentpart
   when: parent != ""
   ansible.builtin.set_fact:
     parent: "{{ parent }}/{{ part }}"

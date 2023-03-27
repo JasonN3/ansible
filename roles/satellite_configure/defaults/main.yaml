@@ -32,8 +32,13 @@ additional_repos:
 lifecycles:
   - prior: Library
     name: Dev
+    puppet: production
   - prior: Dev
     name: Prod
+    puppet: production
+
+# The default Puppet environment. It should be the earliest step in your lifecycle
+default_environment: production
 
 # Host groups to create
 host_groups:

@@ -14,6 +14,83 @@
     - satellite-configure
     - satellite-configure-contentviews
 
+- name: Create Red Hat Content View # noqa: args[module]
+  theforeman.foreman.content_view:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "Red Hat"
+    repositories: "{{ (all_repos | json_query('results[*].repositories[*].{ name: name, product: product.name }[0][?starts_with(product, \"Red Hat Enterprise Linux\")]')) }}"
+  register: cv_rh_changed
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews
+
+- name: Publish new version of Red Hat Content View # noqa: no-handler
+  when: cv_rh_changed.changed
+  theforeman.foreman.content_view_version:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    content_view: "Red Hat"
+    lifecycle_environments:
+      - Library
+  register: cv_rh_published
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews
+
+- name: Create EPEL Content View # noqa: args[module]
+  theforeman.foreman.content_view:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "EPEL"
+    solve_dependencies: true
+    repositories: "{{ (all_repos | json_query('results[*].repositories[*].{ name: name, product: product.name }[0][?starts_with(product, \"EPEL\")]')) }}"
+  register: cv_epel_changed
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews
+
+- name: Create EPEL filter
+  theforeman.foreman.content_view_filter:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "included packages"
+    content_view: EPEL
+    filter_type: "rpm"
+    inclusion: True
+  register: cv_epel_changed_filter
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews
+
+- name: Publish new version of EPEL Content View # noqa: no-handler
+  when: cv_epel_changed.changed or cv_epel_changed_filter.changed
+  theforeman.foreman.content_view_version:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    content_view: "EPEL"
+    lifecycle_environments:
+      - Library
+  register: cv_epel_published
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews
+
 - name: Create Everything Content View # noqa: args[module]
   theforeman.foreman.content_view:
     username: "{{ admin_username }}"
@@ -22,14 +99,19 @@
     validate_certs: false
     organization: "{{ organization }}"
     name: "Everything"
-    repositories: "{{ (all_repos | json_query('results[*].repositories[*].{ name: name, product: product.name }'))[0] }}"
-  register: cv_changed
+    components:
+      - content_view: "Red Hat"
+        latest: true
+      - content_view: "EPEL"
+        latest: true
+    composite: true
+  register: ccv_changed
   tags:
     - satellite-configure
     - satellite-configure-contentviews
 
-- name: Publish new version of Everything Content View # noqa: no-handler
-  when: cv_changed.changed
+- name: Publish new version of Everything Composite Content View # noqa: no-handler
+  when: ccv_changed.changed or cv_epel_published.changed or cv_rh_published.changed
   theforeman.foreman.content_view_version:
     username: "{{ admin_username }}"
     password: "{{ admin_password }}"
@@ -37,8 +119,7 @@
     validate_certs: false
     organization: "{{ organization }}"
     content_view: "Everything"
-    lifecycle_environments:
-      - Library
+    lifecycle_environments: "{{ ['Library'] + (lifecycles | json_query('[].name')) }}"
   tags:
     - satellite-configure
     - satellite-configure-contentviews

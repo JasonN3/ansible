@@ -20,19 +20,11 @@
     - satellite-configure
     - satellite-configure-puppet
 
-- name: Configure Puppetfile
-  ansible.builtin.copy:
-    src: "{{ role_path }}/files/Puppetfile"
-    dest: /etc/puppetlabs/code/Puppetfile
-    owner: root
-    group: root
-  tags:
-    - satellite-configure
-    - satellite-configure-puppet
-
-- name: Clone general modules # noqa: no-changed-when
-  ansible.builtin.command:
-    cmd: r10k puppetfile install --puppetfile=/etc/puppetlabs/code/Puppetfile --moduledir=/etc/puppetlabs/code
+- name: Clone modules
+  ansible.builtin.git:
+    repo: "https://github.com/JasonN3/puppet_modules.git"
+    dest: /etc/puppetlabs/code/modules/
+    version: "main"
   tags:
     - satellite-configure
     - satellite-configure-puppet

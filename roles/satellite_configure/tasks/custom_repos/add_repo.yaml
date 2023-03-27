@@ -9,7 +9,7 @@
     organization: "{{ organization }}"
     name: "{{ item.product }}-{{ item.repo_name }}-GPGKey"
     content_type: gpg_key
-    content: "{{ lookup('ansible.builtin.url', item.gpg_key, ) }}"
+    content: "{{ lookup('ansible.builtin.url', item.gpg_key, ) }}" # noqa: jinja-spacing
 
 - name: Create Product
   theforeman.foreman.product:
