@@ -12,6 +12,11 @@
     parent: "{{ parent | default(omit) }}"
     lifecycle_environment: "{{ lifecycle if ( ( ( part | split('-') )[-1] ) == lifecycle ) else 'Library' if part == 'General' else omit }}"
     environment: "{{ lifecycles | json_query('[?name == `' ~ lifecycle ~ '`].puppet') | first if ( ( ( part | split('-') )[-1] ) == lifecycle ) else default_environment if part == 'General' else omit }}"
+    content_view: "{{ default_contentview if part == 'General' }}"
+    content_source: "{{ groups['satellite'][0] if part == 'General' }}"
+    puppet_proxy: "{{ groups['satellite'][0] if part == 'General' }}"
+    puppet_ca_proxy: "{{ groups['satellite'][0] if part == 'General' }}"
+    activation_keys: "rhel-{{ lifecycle | lower if ( ( ( part | split('-') )[-1] ) == lifecycle ) else omit }}"
   tags:
     - satellite-configure
     - satellite-configure-hostgroups

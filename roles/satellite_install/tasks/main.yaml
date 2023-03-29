@@ -67,6 +67,9 @@
     - satellite-install
     - satellite-install-installer
 
+- name: Set DNS server
+  when: "foreman-proxy-dns true" in additional_features
+
 - name: Configure Firewalld
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/firewall.yaml"
   tags:

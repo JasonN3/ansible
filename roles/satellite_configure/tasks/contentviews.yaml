@@ -1,5 +1,18 @@
 ---
 
+- name: Get all enabled products
+  theforeman.foreman.resource_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    resource: products
+    organization: "{{ organization }}"
+  register: products
+  tags:
+    - satellite-configure
+    - satellite-configure-contentviews
+
 - name: Get all repositories
   theforeman.foreman.repository_info:
     username: "{{ admin_username }}"
@@ -14,6 +27,16 @@
     - satellite-configure
     - satellite-configure-contentviews
 
+- name: Get all repos
+  ansible.builtin.set_fact:
+    repos: "{{ (all_repos | json_query('results[*].repositories[*].{ name: name, product: product.name }')) }}"
+    repos_clean: []
+
+- name: Collapse lists
+  with_items: "{{ repos }}"
+  ansible.builtin.set_fact:
+    repos_clean: "{{ repos_clean + [ item ] }}"
+
 - name: Create Red Hat Content View # noqa: args[module]
   theforeman.foreman.content_view:
     username: "{{ admin_username }}"
@@ -22,7 +45,7 @@
     validate_certs: false
     organization: "{{ organization }}"
     name: "Red Hat"
-    repositories: "{{ (all_repos | json_query('results[*].repositories[*].{ name: name, product: product.name }[0][?starts_with(product, \"Red Hat Enterprise Linux\")]')) }}"
+    repositories: "{{ repos_clean | json_query('[?starts_with(product, `Red Hat Enterprise Linux`)]') }}"
   register: cv_rh_changed
   tags:
     - satellite-configure
@@ -53,7 +76,7 @@
     organization: "{{ organization }}"
     name: "EPEL"
     solve_dependencies: true
-    repositories: "{{ (all_repos | json_query('results[*].repositories[*].{ name: name, product: product.name }[0][?starts_with(product, \"EPEL\")]')) }}"
+    repositories: "{{ repos_clean | json_query('[?starts_with(product, `EPEL`)]') }}"
   register: cv_epel_changed
   tags:
     - satellite-configure
@@ -70,6 +93,7 @@
     content_view: EPEL
     filter_type: "rpm"
     inclusion: True
+    rule_name: "none"
   register: cv_epel_changed_filter
   tags:
     - satellite-configure

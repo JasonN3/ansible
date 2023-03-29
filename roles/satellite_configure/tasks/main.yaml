@@ -68,6 +68,12 @@
     - satellite-configure
     - satellite-configure-computeresources
 
+- name: Create Activation Keys
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/activation_keys.yaml"
+  tags:
+    - satellite-configure
+    - satellite-configure-activationkeys
+
 # If you're reading this, I'm sorry. Writing recursion without variable scoping is complicated.
 - name: Create Host Groups
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups.yaml"

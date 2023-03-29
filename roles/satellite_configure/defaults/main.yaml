@@ -39,6 +39,7 @@ lifecycles:
 
 # The default Puppet environment. It should be the earliest step in your lifecycle
 default_environment: production
+default_contentview: Everything
 
 # Host groups to create
 host_groups:
