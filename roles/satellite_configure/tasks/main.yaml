@@ -74,19 +74,6 @@
     - satellite-configure
     - satellite-configure-activationkeys
 
-# If you're reading this, I'm sorry. Writing recursion without variable scoping is complicated.
-- name: Create Host Groups
-  ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups.yaml"
-  tags:
-    - satellite-configure
-    - satellite-configure-hostgroups
-
-- name: Configure Subnets
-  ansible.builtin.include_tasks: "{{ role_path }}/tasks/subnets.yaml"
-  tags:
-    - satellite-configure
-    - satellite-configure-subnets
-
 - name: Demo management
   when: deployment == 'demo'
   ansible.builtin.set_fact:
@@ -116,3 +103,16 @@
   tags:
     - satellite-configure
     - satellite-configure-puppet
+
+# If you're reading this, I'm sorry. Writing recursion without variable scoping is complicated.
+- name: Create Host Groups
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups.yaml"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Configure Subnets
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/subnets.yaml"
+  tags:
+    - satellite-configure
+    - satellite-configure-subnets

@@ -67,9 +67,36 @@
     - satellite-install
     - satellite-install-installer
 
-- name: Set DNS server
-  when: "foreman-proxy-dns true" in additional_features
+- name: Set DNS server - check for network-scripts
+  when: "'foreman-proxy-dns true' in additional_features"
+  ansible.builtin.stat:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ (ansible_interfaces | json_query('[?name != `lo`]'))[0] }}"
+  register: network_scripts
 
+- name: Set DNS server - network-scripts
+  when: "'foreman-proxy-dns true' in additional_features and network_scripts.stat.exists"
+  ansible.builtin.lineinfile:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ (ansible_interfaces | json_query('[?name != `lo`]'))[0] }}"
+    regexp: '^DNS1='
+    line: 'DNS1=127.0.0.1'
+
+- name: Set DNS server - NetworkManager
+  when: "'foreman-proxy-dns true' in additional_features and not network_scripts.stat.exists"
+  community.general.ini_file:
+    path: /etc/NetworkManager/conf.d/global-dns.conf
+    section: global-dns
+    option: servers
+    value: '127.0.0.1'
+    mode: '0644'
+    no_extra_spaces: true
+  register: nm_changed
+
+- name: Reload network manager
+  when: "'foreman-proxy-dns true' in additional_features and nm_changed.changed"
+  ansible.builtin.service:
+    name: NetworkManager
+    state: reloaded
+  
 - name: Configure Firewalld
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/firewall.yaml"
   tags:

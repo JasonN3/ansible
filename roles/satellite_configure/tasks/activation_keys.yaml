@@ -29,7 +29,9 @@
 
 - name: Get Satellite Client Repos
   ansible.builtin.set_fact:
-    repos: "{{ all_repos | json_query('results[*].repositories[?starts_with(content_label, `satellite-client-`)].{ label: content_label, override: `enabled` }') }}"
+    repos: >
+      {{ all_repos |
+      json_query('results[*].repositories[?starts_with(content_label, `satellite-client-`)].{ label: content_label, override: `enabled` }') }}
     repos_clean: []
   tags:
     - satellite-configure
@@ -38,12 +40,12 @@
 - name: Collapse lists
   with_items: "{{ repos }}"
   ansible.builtin.set_fact:
-    repos_clean: "{{ repos_clean + [ item ] }}"
+    repos_clean: "{{ repos_clean + [item] }}"
   tags:
     - satellite-configure
     - satellite-configure-activationkeys
 
-- name: "Create activation keys"
+- name: "Create activation keys" # noqa:args[module]
   with_items: "{{ lifecycles | json_query('[].name') }}"
   theforeman.foreman.activation_key:
     username: "{{ admin_username }}"

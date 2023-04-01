@@ -35,7 +35,7 @@
 - name: Collapse lists
   with_items: "{{ repos }}"
   ansible.builtin.set_fact:
-    repos_clean: "{{ repos_clean + [ item ] }}"
+    repos_clean: "{{ repos_clean + [item] }}"
 
 - name: Create Red Hat Content View # noqa: args[module]
   theforeman.foreman.content_view:
@@ -92,7 +92,7 @@
     name: "included packages"
     content_view: EPEL
     filter_type: "rpm"
-    inclusion: True
+    inclusion: true
     rule_name: "none"
   register: cv_epel_changed_filter
   tags:
