@@ -5,6 +5,10 @@ galaxy_info:
 
   license: BSD
   min_ansible_version: "2.13"
+  platforms:
+  - name: RedHat
+    versions:
+    - 8
 
 collections:
   - theforeman.foreman

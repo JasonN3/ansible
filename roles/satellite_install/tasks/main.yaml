@@ -96,7 +96,7 @@
   ansible.builtin.service:
     name: NetworkManager
     state: reloaded
-  
+
 - name: Configure Firewalld
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/firewall.yaml"
   tags:

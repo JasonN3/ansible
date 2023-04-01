@@ -136,7 +136,7 @@
 
 - name: Publish new version of Everything Composite Content View # noqa: no-handler
   when: ccv_changed.changed or cv_epel_published.changed or cv_rh_published.changed
-  theforeman.foreman.content_view_version:
+  theforeman.foreman.content_view_version: # noqa: jinja[invalid]
     username: "{{ admin_username }}"
     password: "{{ admin_password }}"
     server_url: "https://localhost"
