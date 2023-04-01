@@ -1,5 +1,10 @@
 ---
 
+- name: Determine activation key
+  when: ((part | split('-'))[-1]) == lifecycle
+  ansible.builtin.set_fact:
+    hg_activationkey: "rhel-{{ lifecycle | lower }}"
+
 - name: Create Hostgroup
   theforeman.foreman.hostgroup:
     username: "{{ admin_username }}"
@@ -11,11 +16,20 @@
     architecture: "x86_64"
     state: present
     parent: "{{ parent | default(omit) }}"
+    lifecycle_environment: "{{ lifecycle if (((part | split('-'))[-1]) == lifecycle) else 'Library' if part == 'General' else omit }}"
+    environment: >-
+      {{ lifecycles | json_query('[?name == `' ~ lifecycle ~ '`].puppet') | first if ( ( ( part | split('-') )[-1] ) == lifecycle )
+      else default_environment if part == 'General' else omit }}
+    content_view: "{{ default_contentview if part == 'General' else omit }}"
+    content_source: "{{ groups['satellite'][0] if part == 'General' else omit }}"
+    puppet_proxy: "{{ groups['satellite'][0] if part == 'General' else omit }}"
+    puppet_ca_proxy: "{{ groups['satellite'][0] if part == 'General' else omit }}"
+    activation_keys: "{{ hg_activationkey if ((part | split('-'))[-1]) == lifecycle else omit }}"
   tags:
     - satellite-configure
     - satellite-configure-hostgroups
 
-- name: Append parent
+- name: Append parentpart
   when: parent != ""
   ansible.builtin.set_fact:
     parent: "{{ parent }}/{{ part }}"

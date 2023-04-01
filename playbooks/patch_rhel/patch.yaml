@@ -40,7 +40,7 @@
         name: '*'
         state: latest
 
-    - name: Check to see if we need a reboot
+    - name: Check to see if we need a reboot # noqa: no-changed-when
       when: reboot == 'auto'
       ansible.builtin.command: needs-restarting -r
       register: result

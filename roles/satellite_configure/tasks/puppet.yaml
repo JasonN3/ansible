@@ -3,16 +3,28 @@
 - name: Install R10k gem
   community.general.gem:
     name: r10k
+    executable: '/opt/puppetlabs/puppet/bin/gem'
     user_install: false
   tags:
     - satellite-configure
     - satellite-configure-puppet
 
-- name: Clone general modules
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: /opt/puppetlabs/puppet/bin/r10k
+    dest: /usr/bin/r10k
+    owner: root
+    group: root
+    state: link
+  tags:
+    - satellite-configure
+    - satellite-configure-puppet
+
+- name: Clone modules
   ansible.builtin.git:
-    repo: 'https://github.com/JasonN3/puppet_modules.git'
+    repo: "https://github.com/JasonN3/puppet_modules.git"
     dest: /etc/puppetlabs/code/modules/
-    version: main
+    version: "main"
   tags:
     - satellite-configure
     - satellite-configure-puppet

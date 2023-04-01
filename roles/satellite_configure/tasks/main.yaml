@@ -20,11 +20,17 @@
     - satellite-configure
     - satellite-configure-manifest
 
-- name: Enable Reposets and Add Custom Repos
+- name: Enable Reposets
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/enable_reposets.yaml"
   tags:
     - satellite-configure
     - satellite-configure-reposets
+
+- name: Enable Custom Repos
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/custom_repos.yaml"
+  tags:
+    - satellite-configure
+    - satellite-configure-custom_repos
 
 - name: Set Kickstart to immediate
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/kickstart.yaml"
@@ -62,18 +68,11 @@
     - satellite-configure
     - satellite-configure-computeresources
 
-# If you're reading this, I'm sorry. Writing recursion without variable scoping is complicated.
-- name: Create Host Groups
-  ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups.yaml"
+- name: Create Activation Keys
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/activation_keys.yaml"
   tags:
     - satellite-configure
-    - satellite-configure-hostgroups
-
-- name: Configure Subnets
-  ansible.builtin.include_tasks: "{{ role_path }}/tasks/subnets.yaml"
-  tags:
-    - satellite-configure
-    - satellite-configure-subnets
+    - satellite-configure-activationkeys
 
 - name: Demo management
   when: deployment == 'demo'
@@ -104,3 +103,16 @@
   tags:
     - satellite-configure
     - satellite-configure-puppet
+
+# If you're reading this, I'm sorry. Writing recursion without variable scoping is complicated.
+- name: Create Host Groups
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/hostgroups.yaml"
+  tags:
+    - satellite-configure
+    - satellite-configure-hostgroups
+
+- name: Configure Subnets
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/subnets.yaml"
+  tags:
+    - satellite-configure
+    - satellite-configure-subnets

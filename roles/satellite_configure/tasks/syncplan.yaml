@@ -23,7 +23,7 @@
     organization: "{{ organization }}"
     interval: "daily"
     enabled: true
-    sync_date: "2022-01-01 00:00:00 UTC"
+    sync_date: "{{ sync_time }}"
     products: "{{ products | json_query('resources[?repository_count > `0`].name') }}"
     state: present
   tags:

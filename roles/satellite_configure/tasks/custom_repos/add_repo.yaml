@@ -1,0 +1,39 @@
+---
+
+- name: Create GPG key credential
+  theforeman.foreman.content_credential:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "{{ item.product }}-{{ item.repo_name }}-GPGKey"
+    content_type: gpg_key
+    content: "{{ lookup('ansible.builtin.url', item.gpg_key, ) }}" # noqa: jinja[spacing]
+
+- name: Create Product
+  theforeman.foreman.product:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "{{ item.product }}"
+    state: present
+
+- name: Create Repository # noqa: args[module]
+  theforeman.foreman.repository:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    name: "{{ item.repo_name }}"
+    state: present
+    content_type: "yum"
+    product: "{{ item.product }}"
+    url: "{{ item.base_url }}"
+    download_policy: immediate
+    arch: "{{ item.arch | default('x86_64') }}"
+    os_versions: "{{ item.os_versions }}"
+    gpg_key: "{{ item.product }}-{{ item.repo_name }}-GPGKey"

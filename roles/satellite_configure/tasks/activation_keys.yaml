@@ -1,0 +1,62 @@
+---
+
+- name: Get all enabled products
+  theforeman.foreman.resource_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    resource: products
+    organization: "{{ organization }}"
+  register: products
+  tags:
+    - satellite-configure
+    - satellite-configure-activationkeys
+
+- name: Get all repositories
+  theforeman.foreman.repository_info:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    organization: "{{ organization }}"
+    product: "{{ item }}"
+  with_items: "{{ products | json_query('resources[?repository_count > `0`].name') }}"
+  register: all_repos
+  tags:
+    - satellite-configure
+    - satellite-configure-activationkeys
+
+- name: Get Satellite Client Repos
+  ansible.builtin.set_fact:
+    repos: >
+      {{ all_repos |
+      json_query('results[*].repositories[?starts_with(content_label, `satellite-client-`)].{ label: content_label, override: `enabled` }') }}
+    repos_clean: []
+  tags:
+    - satellite-configure
+    - satellite-configure-activationkeys
+
+- name: Collapse lists
+  with_items: "{{ repos }}"
+  ansible.builtin.set_fact:
+    repos_clean: "{{ repos_clean + [item] }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-activationkeys
+
+- name: "Create activation keys" # noqa:args[module]
+  with_items: "{{ lifecycles | json_query('[].name') }}"
+  theforeman.foreman.activation_key:
+    username: "{{ admin_username }}"
+    password: "{{ admin_password }}"
+    server_url: "https://localhost"
+    validate_certs: false
+    name: "rhel-{{ item | lower }}"
+    organization: "{{ organization }}"
+    lifecycle_environment: "{{ item }}"
+    content_view: "{{ default_contentview }}"
+    content_overrides: "{{ repos_clean }}"
+  tags:
+    - satellite-configure
+    - satellite-configure-activationkeys
