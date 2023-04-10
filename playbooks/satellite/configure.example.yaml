@@ -7,8 +7,9 @@ organization: "Default Organization"
 # The default Location that will be created during installation
 location: "Default Location"
 
+
 # The admin username and password that will be created during installation
-## An empty password will randomly generate a password and store it in persistent.yaml
+## An empty password will randomly generate a password
 admin_username: "admin"
 admin_password: ""
 
@@ -36,6 +37,9 @@ lifecycles:
 # The default Puppet environment. It should be the earliest step in your lifecycle
 default_environment: production
 
+# The default Content View to assign to all hosts 
+default_contentview: Everything
+
 # Host groups to create
 host_groups:
   General:
@@ -47,6 +51,8 @@ departments:
   - Department1
   - Department2
 
+# The subnets to configure
+# Remove any *_server entries for features that are not enabled
 subnets: []
 # - name: NAME
 #   description: DESCRIPTION
@@ -83,10 +89,14 @@ additional_repos:
     repo_name: "Everything"
     base_url: "https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/"
     gpg_key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL"
+    os_versions:
+      - rhel-8
   - product: "EPEL8"
     repo_name: "Modular"
     base_url: "https://dl.fedoraproject.org/pub/epel/8/Modular/x86_64/"
     gpg_key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL"
+    os_versions:
+      - rhel-8
 
 # Compute Resource to configure
 compute_resources: []
@@ -103,6 +113,11 @@ compute_resources: []
 # demo: configure for a demo environment
 # prod: configure for a non-demo environment
 deployment: demo
+
+# Defined locations for R10k to sync for Puppet environments
+puppet_sources: {}
+#  - name: github-jasonn3
+#    remote: https://github.com/JasonN3/puppet_modules.git
 
 ##################################################################################################
 ############################################ OPTIONAL ############################################
@@ -124,3 +139,7 @@ packages8: []
 
 # Additional Red Hat Repos to add
 additional_redhat_repos: []
+
+# When all of the repositories should sync each day
+# The day does not matter
+sync_time: "2022-01-01 04:00:00 CST"

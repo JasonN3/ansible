@@ -5,31 +5,6 @@
     - name: Ensure the machine is online
       ansible.builtin.wait_for_connection:
 
-    - name: Create VMware Snapshot
-      when: >
-        vcenter_hostname is defined and
-        vcenter_username is defined and
-        vcenter_password is defined and
-        snapshot_during_patching is defined and
-        snapshot_during_patching == 'yes'
-      community.vmware.vmware_guest_snapshot:
-        hostname: "{{ vcenter_hostname }}"
-        username: "{{ vcenter_username }}"
-        password: "{{ vcenter_password }}"
-        datacenter: "{{ datacenter_name }}"
-        folder: "/{{ datacenter_name }}/vm/"
-        name: "{{ guest_name }}"
-        state: present
-        snapshot_name: snap1
-        description: snap1_description
-      delegate_to: localhost
-      tags:
-        - snapshot
-        - snapshot_vmware
-
-    - name: Ensure the machine recovered after the snapshot
-      ansible.builtin.wait_for_connection:
-
     - name: Install needs-restarting
       ansible.builtin.package:
         name: yum-utils
@@ -56,24 +31,3 @@
       loop: "{{ foreman_ansible_roles }}"
       loop_control:
         loop_var: role
-
-    - name: Delete VMware Snapshot
-      when: >
-        vcenter_hostname is defined and
-        vcenter_username is defined and
-        vcenter_password is defined and
-        snapshot_during_patching is defined and
-        snapshot_during_patching == 'yes'
-      community.vmware.vmware_guest_snapshot:
-        hostname: "{{ vcenter_hostname }}"
-        username: "{{ vcenter_username }}"
-        password: "{{ vcenter_password }}"
-        datacenter: "{{ datacenter_name }}"
-        folder: "/{{ datacenter_name }}/vm/"
-        name: "{{ guest_name }}"
-        state: absent
-        snapshot_name: snap1
-      delegate_to: localhost
-      tags:
-        - snapshot
-        - snapshot_vmware

@@ -27,13 +27,6 @@
     - satellite-install
     - satellite-install-repos
 
-- name: Install Dependencies
-  ansible.builtin.include_tasks: "{{ role_path }}/tasks/dependencies.yaml"
-  tags:
-    - satellite-install
-    - satellite-install-dependencies
-
-
 - name: Update all packages # noqa: package-latest
   become: true
   ansible.builtin.package:
@@ -60,6 +53,12 @@
     - satellite-install
     - satellite-install-updateall
     - satellite-install-updateall-reboot
+
+- name: Install Dependencies
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/dependencies.yaml"
+  tags:
+    - satellite-install
+    - satellite-install-dependencies
 
 - name: Install Satellite
   ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yaml"

@@ -23,6 +23,8 @@
     repository: "{{ item.name }}"
     organization: "{{ organization }}"
   with_items: "{{ repositories | json_query('resources[?content_type == `yum`].{ name: name, product: product.name }') }}"
+  async: 5
+  poll: 5
   tags:
     - satellite-configure
     - satellite-configure-syncrepos
