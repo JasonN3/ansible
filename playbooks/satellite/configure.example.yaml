@@ -37,7 +37,7 @@ lifecycles:
 # The default Puppet environment. It should be the earliest step in your lifecycle
 default_environment: production
 
-# The default Content View to assign to all hosts 
+# The default Content View to assign to all hosts
 default_contentview: Everything
 
 # Host groups to create
