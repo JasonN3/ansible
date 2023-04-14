@@ -2,3 +2,7 @@ collections:
   - name: theforeman.foreman
   - name: community.general
   - name: ansible.posix
+
+roles:
+  - name: jasonn3.satellite_install
+  - name: jasonn3.satellite_configure
