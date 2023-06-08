@@ -1,0 +1,6 @@
+[submodule "roles/satellite_configure"]
+	path = roles/satellite_configure
+	url = https://github.com/JasonN3/satellite_configure.git
+[submodule "roles/satellite_install"]
+	path = roles/satellite_install
+	url = https://github.com/JasonN3/satellite_install.git

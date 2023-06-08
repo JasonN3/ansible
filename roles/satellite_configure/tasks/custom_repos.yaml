@@ -1,5 +1,0 @@
----
-
-- name: Add Custom Repos
-  with_items: "{{ additional_repos }}"
-  ansible.builtin.include_tasks: "{{ role_path }}/tasks/custom_repos/add_repo.yaml"
